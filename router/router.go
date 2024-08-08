@@ -11,14 +11,14 @@ import (
 type Router struct {
 	addr         string
 	baseURL      string
-	tasksHandler common.IContrller
+	tasksHandler common.IController
 }
 
 // Config is the struct for configuring the Router.
 type Config struct {
 	Addr         string
 	BaseURL      string
-	TasksHandler common.IContrller
+	TasksHandler common.IController
 }
 
 // NewRouter creates a new instance of Router with the given configuration.
@@ -46,4 +46,3 @@ func (r *Router) Run() error {
 	log.Println("Listening on", r.addr)
 	return router.Run(r.addr)
 }
-
