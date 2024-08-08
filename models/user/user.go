@@ -16,7 +16,7 @@ Dependencies:
 - github.com/google/uuid: Used for generating unique IDs.
 - github.com/nbutton23/zxcvbn-go: Used for password strength evaluation.
 */
-package models
+package usermodel
 
 import (
 	"regexp"
@@ -39,7 +39,7 @@ var (
 	usernameRegex = regexp.MustCompile(usernamePattern)
 )
 
-// User represents the aggregate user.
+// User represents the aggregate user with private fields.
 type User struct {
 	id           uuid.UUID
 	username     string
@@ -47,37 +47,31 @@ type User struct {
 	isAdmin      bool
 }
 
+// User represents the aggregate user with private fields.
+type UserBSON struct {
+	ID           uuid.UUID `bson:"_id"`
+	Username     string    `bson:"username"`
+	PasswordHash string    `bson:"passwordHash"`
+	IsAdmin      bool      `bson:"isAdmin"`
+}
+
 // Config holds all mandatory parameters for creating a new User.
 type Config struct {
-	// Username must be non-empty and adhere to the username format and length constraints.
-	Username string
-
-	// PlainPassword must meet the minimum password strength requirements.
-	PlainPassword string
-
-	IsAdmin bool
-
-	// PasswordHasher is a service used to hash the plain password.
+	Username       string
+	PlainPassword  string
+	IsAdmin        bool
 	PasswordHasher hash.IService
 }
 
 // ConfigBSON holds all parameters for creating a User with an existing password hash.
 type ConfigBSON struct {
-	ID           uuid.UUID // Unique identifier for the user
-	Username     string    // Username of the user
-	PasswordHash string    // Pre-hashed password for the user
+	ID           uuid.UUID
+	Username     string
+	PasswordHash string
 	IsAdmin      bool
 }
 
 // New creates a new User with the provided configuration.
-//
-// Returns:
-// - A pointer to the newly created User if successful.
-// - An error if any of the following conditions are not met:
-//   - Any field in the config is missing.
-//   - The username does not meet format, length, or validity constraints.
-//   - The password does not meet the minimum strength requirements.
-//   - An error occurs during password hashing.
 func New(config Config) (*User, error) {
 	if err := validateUsername(config.Username); err != nil {
 		return nil, err
@@ -101,13 +95,6 @@ func New(config Config) (*User, error) {
 }
 
 // ToBSON creates a new User with the provided configuration, where the password is already hashed.
-//
-// Returns:
-// - A pointer to the newly created User if successful.
-// - An error if any of the following conditions are not met:
-//   - The username does not meet format, length, or validity constraints.
-//   - The password hash is not valid or empty.
-//   - Any other unexpected error occurs during user creation.
 func ToBSON(config ConfigBSON) (*User, error) {
 	if err := validateUsername(config.Username); err != nil {
 		return nil, err
@@ -119,6 +106,16 @@ func ToBSON(config ConfigBSON) (*User, error) {
 		passwordHash: config.PasswordHash,
 		isAdmin:      config.IsAdmin,
 	}, nil
+}
+
+// FromBSON creates a User from a BSON representation.
+func FromBSON(bsonUser *UserBSON) *User {
+	return &User{
+		id:           bsonUser.ID,
+		username:     bsonUser.Username,
+		passwordHash: bsonUser.PasswordHash,
+		isAdmin:      bsonUser.IsAdmin,
+	}
 }
 
 // validateUsername validates the username according to the defined rules.
