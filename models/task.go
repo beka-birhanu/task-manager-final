@@ -43,7 +43,7 @@ func (t *Task) ToBSON() *TaskBSON {
 		Description: t.Description(),
 		DueDate:     t.DueDate(),
 		Status:      t.Status(),
-		UpdatedAt:   time.Now(), // Update timestamp on modification
+		UpdatedAt:   time.Now(),
 	}
 }
 
@@ -145,4 +145,3 @@ func (t *Task) Update(config TaskConfig) error {
 	t.status = config.Status
 	return nil
 }
-
