@@ -1,4 +1,4 @@
-package controllers
+package taskcontrollers
 
 import (
 	"fmt"
@@ -6,24 +6,24 @@ import (
 
 	"github.com/beka-birhanu/common"
 	irepo "github.com/beka-birhanu/common/i_repo"
-	"github.com/beka-birhanu/controllers/dto"
+	"github.com/beka-birhanu/controllers/task/dto"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
-type TaskController struct {
+type Controller struct {
 	taskService irepo.Task
 }
 
-// NewTaskController creates a new TaskController with the given task service.
-func NewTaskController(taskService irepo.Task) *TaskController {
-	return &TaskController{
+// New creates a new TaskController with the given task service.
+func New(taskService irepo.Task) *Controller {
+	return &Controller{
 		taskService: taskService,
 	}
 }
 
 // Register registers the task routes.
-func (c *TaskController) Register(route gin.RouterGroup) {
+func (c *Controller) Register(route gin.RouterGroup) {
 	tasks := route.Group("/tasks")
 	{
 		tasks.POST("", c.addTask)
@@ -34,7 +34,7 @@ func (c *TaskController) Register(route gin.RouterGroup) {
 	}
 }
 
-func (c *TaskController) addTask(ctx *gin.Context) {
+func (c *Controller) addTask(ctx *gin.Context) {
 	var request dto.AddTaskRequest
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
@@ -59,7 +59,7 @@ func (c *TaskController) addTask(ctx *gin.Context) {
 	ctx.Status(http.StatusCreated)
 }
 
-func (c *TaskController) updateTask(ctx *gin.Context) {
+func (c *Controller) updateTask(ctx *gin.Context) {
 	id, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid task ID"})
@@ -86,7 +86,7 @@ func (c *TaskController) updateTask(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (c *TaskController) deleteTask(ctx *gin.Context) {
+func (c *Controller) deleteTask(ctx *gin.Context) {
 	id, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid task ID"})
@@ -106,7 +106,7 @@ func (c *TaskController) deleteTask(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (c *TaskController) getAllTasks(ctx *gin.Context) {
+func (c *Controller) getAllTasks(ctx *gin.Context) {
 	tasks, err := c.taskService.GetAll()
 	if err != nil {
 		ctx.Status(http.StatusInternalServerError)
@@ -126,7 +126,7 @@ func (c *TaskController) getAllTasks(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (c *TaskController) getTask(ctx *gin.Context) {
+func (c *Controller) getTask(ctx *gin.Context) {
 	id, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid task ID"})

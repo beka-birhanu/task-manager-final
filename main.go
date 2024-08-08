@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/beka-birhanu/controllers"
-	"github.com/beka-birhanu/data"
+	taskcontrollers "github.com/beka-birhanu/controllers/task"
+	taskrepo "github.com/beka-birhanu/data/task"
 	"github.com/beka-birhanu/router"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -31,10 +31,10 @@ func main() {
 	}
 
 	// Create a new task service instance
-	taskService := data.NewTaskRepo(client, "taskdb", "tasks")
+	taskService := taskrepo.New(client, "taskdb", "tasks")
 
 	// Create a new task controller instance
-	taskController := controllers.NewTaskController(taskService)
+	taskController := taskcontrollers.New(taskService)
 
 	// Create a new router instance with configuration
 	routerConfig := router.Config{
