@@ -1,4 +1,4 @@
-package models
+package taskmodel
 
 import (
 	"time"
@@ -66,8 +66,8 @@ type TaskConfig struct {
 	Status      Status
 }
 
-// NewTask creates a new Task with the given configuration, validates its properties, and generates an ID.
-func NewTask(config TaskConfig) (*Task, error) {
+// New creates a new Task with the given configuration, validates its properties, and generates an ID.
+func New(config TaskConfig) (*Task, error) {
 	if err := validateTaskConfig(config); err != nil {
 		return nil, err
 	}

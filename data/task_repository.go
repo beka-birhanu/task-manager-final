@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/beka-birhanu/common"
-	"github.com/beka-birhanu/models"
+	"github.com/beka-birhanu/models/taskmodel"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -31,11 +31,11 @@ func createScopedContext() (context.Context, context.CancelFunc) {
 }
 
 // Add adds a new task to the collection. Returns an error if there is an ID conflict.
-func (s *TaskService) Add(title, description string, dueDate time.Time, status models.Status) (*models.Task, error) {
+func (s *TaskService) Add(title, description string, dueDate time.Time, status taskmodel.Status) (*taskmodel.Task, error) {
 	ctx, cancel := createScopedContext()
 	defer cancel()
 
-	taskConfig := models.TaskConfig{
+	taskConfig := taskmodel.TaskConfig{
 		Title:       title,
 		Description: description,
 		DueDate:     dueDate,
@@ -44,7 +44,7 @@ func (s *TaskService) Add(title, description string, dueDate time.Time, status m
 
 	// Recreate task until the ID conflict is resolved
 	for {
-		task, err := models.NewTask(taskConfig)
+		task, err := taskmodel.New(taskConfig)
 		if err != nil {
 			return nil, err
 		}
@@ -62,7 +62,7 @@ func (s *TaskService) Add(title, description string, dueDate time.Time, status m
 }
 
 // Update updates an existing task. Returns an error if the task is not found.
-func (s *TaskService) Update(id uuid.UUID, title, description string, dueDate time.Time, status models.Status) (*models.Task, error) {
+func (s *TaskService) Update(id uuid.UUID, title, description string, dueDate time.Time, status taskmodel.Status) (*taskmodel.Task, error) {
 	ctx, cancel := createScopedContext()
 	defer cancel()
 
@@ -85,11 +85,11 @@ func (s *TaskService) Update(id uuid.UUID, title, description string, dueDate ti
 		return nil, result.Err()
 	}
 
-	var taskBSON models.TaskBSON
+	var taskBSON taskmodel.TaskBSON
 	if err := result.Decode(&taskBSON); err != nil {
 		return nil, err
 	}
-	task := models.FromBSON(&taskBSON)
+	task := taskmodel.FromBSON(&taskBSON)
 	return task, nil
 }
 
@@ -110,7 +110,7 @@ func (s *TaskService) Delete(id uuid.UUID) error {
 }
 
 // GetAll returns a list of pointers to all tasks.
-func (s *TaskService) GetAll() ([]*models.Task, error) {
+func (s *TaskService) GetAll() ([]*taskmodel.Task, error) {
 	ctx, cancel := createScopedContext()
 	defer cancel()
 
@@ -120,13 +120,13 @@ func (s *TaskService) GetAll() ([]*models.Task, error) {
 	}
 	defer cursor.Close(ctx)
 
-	var tasks []*models.Task
+	var tasks []*taskmodel.Task
 	for cursor.Next(ctx) {
-		var taskBSON models.TaskBSON
+		var taskBSON taskmodel.TaskBSON
 		if err := cursor.Decode(&taskBSON); err != nil {
 			return nil, err
 		}
-		tasks = append(tasks, models.FromBSON(&taskBSON))
+		tasks = append(tasks, taskmodel.FromBSON(&taskBSON))
 	}
 	if err := cursor.Err(); err != nil {
 		return nil, err
@@ -135,19 +135,18 @@ func (s *TaskService) GetAll() ([]*models.Task, error) {
 }
 
 // GetSingle returns a task by ID. Returns an error if the task is not found.
-func (s *TaskService) GetSingle(id uuid.UUID) (*models.Task, error) {
+func (s *TaskService) GetSingle(id uuid.UUID) (*taskmodel.Task, error) {
 	ctx, cancel := createScopedContext()
 	defer cancel()
 
 	filter := bson.M{"_id": id}
-	var taskBSON models.TaskBSON
+	var taskBSON taskmodel.TaskBSON
 	if err := s.collection.FindOne(ctx, filter).Decode(&taskBSON); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, common.ErrNotFound
 		}
 		return nil, err
 	}
-	task := models.FromBSON(&taskBSON)
+	task := taskmodel.FromBSON(&taskBSON)
 	return task, nil
 }
-
