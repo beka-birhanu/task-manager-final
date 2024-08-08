@@ -1,4 +1,4 @@
-package data
+package userrepo
 
 import (
 	"context"
@@ -12,15 +12,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// UserService handles the persistence of user models.
-type UserService struct {
+// UserRepo handles the persistence of user models.
+type UserRepo struct {
 	collection *mongo.Collection
 }
 
-// NewUserService creates a new UserService with the given MongoDB client, database name, and collection name.
-func NewUserService(client *mongo.Client, dbName, collectionName string) *UserService {
+// NewUserRepo creates a new UserRepo with the given MongoDB client, database name, and collection name.
+func NewUserRepo(client *mongo.Client, dbName, collectionName string) *UserRepo {
 	collection := client.Database(dbName).Collection(collectionName)
-	return &UserService{
+	return &UserRepo{
 		collection: collection,
 	}
 }
@@ -28,7 +28,7 @@ func NewUserService(client *mongo.Client, dbName, collectionName string) *UserSe
 // Save inserts or updates a user in the repository.
 // If the user already exists, it updates the existing record.
 // If the user does not exist, it adds a new record.
-func (u *UserService) Save(user *usermodel.User) error {
+func (u *UserRepo) Save(user *usermodel.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -51,7 +51,7 @@ func (u *UserService) Save(user *usermodel.User) error {
 }
 
 // ById retrieves a user by their ID.
-func (u *UserService) ById(id uuid.UUID) (*usermodel.User, error) {
+func (u *UserRepo) ById(id uuid.UUID) (*usermodel.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -67,7 +67,7 @@ func (u *UserService) ById(id uuid.UUID) (*usermodel.User, error) {
 }
 
 // ByUsername retrieves a user by their username.
-func (u *UserService) ByUsername(username string) (*usermodel.User, error) {
+func (u *UserRepo) ByUsername(username string) (*usermodel.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
