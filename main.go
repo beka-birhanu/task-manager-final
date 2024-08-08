@@ -31,7 +31,7 @@ func main() {
 	}
 
 	// Create a new task service instance
-	taskService := data.NewTaskService(client, "taskdb", "tasks")
+	taskService := data.NewTaskRepo(client, "taskdb", "tasks")
 
 	// Create a new task controller instance
 	taskController := controllers.NewTaskController(taskService)
@@ -49,4 +49,3 @@ func main() {
 		log.Fatalf("Error starting server: %v", err)
 	}
 }
-

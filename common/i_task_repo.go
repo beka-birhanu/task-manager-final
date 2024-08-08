@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type ITaskService interface {
+type ITaskRepo interface {
 
 	// Add adds a new task to the store. Returns an error if there is an ID conflict.
 	Add(title, description, status string, dueDate time.Time) (*taskmodel.Task, error)
