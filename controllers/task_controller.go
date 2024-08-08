@@ -5,17 +5,18 @@ import (
 	"net/http"
 
 	"github.com/beka-birhanu/common"
+	irepo "github.com/beka-birhanu/common/i_repo"
 	"github.com/beka-birhanu/controllers/dto"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
 type TaskController struct {
-	taskService common.ITaskRepo
+	taskService irepo.Task
 }
 
 // NewTaskController creates a new TaskController with the given task service.
-func NewTaskController(taskService common.ITaskRepo) *TaskController {
+func NewTaskController(taskService irepo.Task) *TaskController {
 	return &TaskController{
 		taskService: taskService,
 	}
