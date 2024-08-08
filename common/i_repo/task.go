@@ -3,7 +3,7 @@ package irepo
 import (
 	"time"
 
-	"github.com/beka-birhanu/models/taskmodel"
+	"github.com/beka-birhanu/models/task"
 	"github.com/google/uuid"
 )
 

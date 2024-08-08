@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/beka-birhanu/common"
-	"github.com/beka-birhanu/models/taskmodel"
+	"github.com/beka-birhanu/models/task"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
