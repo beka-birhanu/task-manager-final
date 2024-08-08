@@ -1,9 +1,9 @@
 package models
 
 import (
-	"errors"
 	"time"
 
+	err "github.com/beka-birhanu/errors"
 	"github.com/google/uuid"
 )
 
@@ -84,16 +84,16 @@ func NewTask(config TaskConfig) (*Task, error) {
 // validateTaskConfig checks if the provided task configuration is valid.
 func validateTaskConfig(config TaskConfig) error {
 	if config.Title == "" {
-		return errors.New("title cannot be empty")
+		return err.ErrTitleEmpty
 	}
 	if config.Description == "" {
-		return errors.New("description cannot be empty")
+		return err.ErrDescriptionEmpty
 	}
 	if config.DueDate.IsZero() {
-		return errors.New("due date cannot be zero")
+		return err.ErrDueDateZero
 	}
 	if !isValidStatus(config.Status) {
-		return errors.New("invalid status")
+		return err.ErrInvalidStatus
 	}
 	return nil
 }
