@@ -7,13 +7,10 @@ import (
 	"github.com/google/uuid"
 )
 
-// Status represents the possible statuses of a task.
-type Status string
-
 const (
-	StatusDone       Status = "done"
-	StatusInProgress Status = "inprogress"
-	StatusPending    Status = "pending"
+	StatusDone       = "done"
+	StatusInProgress = "inprogress"
+	StatusPending    = "pending"
 )
 
 // Task represents a task with title, description, due date, status, and ID.
@@ -22,7 +19,7 @@ type Task struct {
 	title       string
 	description string
 	dueDate     time.Time
-	status      Status
+	status      string
 }
 
 // TaskBSON represents the BSON format of a Task for MongoDB operations.
@@ -31,7 +28,7 @@ type TaskBSON struct {
 	Title       string    `bson:"title"`
 	Description string    `bson:"description"`
 	DueDate     time.Time `bson:"dueDate"`
-	Status      Status    `bson:"status"`
+	Status      string    `bson:"status"`
 	UpdatedAt   time.Time `bson:"updatedAt"`
 }
 
@@ -63,7 +60,7 @@ type TaskConfig struct {
 	Title       string
 	Description string
 	DueDate     time.Time
-	Status      Status
+	Status      string
 }
 
 // New creates a new Task with the given configuration, validates its properties, and generates an ID.
@@ -99,7 +96,7 @@ func validateTaskConfig(config TaskConfig) error {
 }
 
 // isValidStatus checks if the given status is one of the allowed statuses.
-func isValidStatus(status Status) bool {
+func isValidStatus(status string) bool {
 	switch status {
 	case StatusDone, StatusInProgress, StatusPending:
 		return true
@@ -129,8 +126,8 @@ func (t *Task) DueDate() time.Time {
 }
 
 // Status returns the task's status.
-func (t *Task) Status() Status {
-	return t.status
+func (t *Task) Status() string {
+	return string(t.status)
 }
 
 // Update updates the task's fields with the provided configuration after validating the data.

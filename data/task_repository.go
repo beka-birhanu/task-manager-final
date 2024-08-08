@@ -31,7 +31,7 @@ func createScopedContext() (context.Context, context.CancelFunc) {
 }
 
 // Add adds a new task to the collection. Returns an error if there is an ID conflict.
-func (s *TaskService) Add(title, description string, dueDate time.Time, status taskmodel.Status) (*taskmodel.Task, error) {
+func (s *TaskService) Add(title, description, status string, dueDate time.Time) (*taskmodel.Task, error) {
 	ctx, cancel := createScopedContext()
 	defer cancel()
 
@@ -62,7 +62,7 @@ func (s *TaskService) Add(title, description string, dueDate time.Time, status t
 }
 
 // Update updates an existing task. Returns an error if the task is not found.
-func (s *TaskService) Update(id uuid.UUID, title, description string, dueDate time.Time, status taskmodel.Status) (*taskmodel.Task, error) {
+func (s *TaskService) Update(id uuid.UUID, title, description, status string, dueDate time.Time) (*taskmodel.Task, error) {
 	ctx, cancel := createScopedContext()
 	defer cancel()
 

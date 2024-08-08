@@ -41,7 +41,7 @@ func (c *TaskController) addTask(ctx *gin.Context) {
 		return
 	}
 
-	task, err := c.taskService.Add(request.Title, request.Description, request.DueDate, request.Status)
+	task, err := c.taskService.Add(request.Title, request.Description, request.Status, request.DueDate)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -72,7 +72,7 @@ func (c *TaskController) updateTask(ctx *gin.Context) {
 		return
 	}
 
-	_, err = c.taskService.Update(id, request.Title, request.Description, request.DueDate, request.Status)
+	_, err = c.taskService.Update(id, request.Title, request.Description, request.Status, request.DueDate)
 	if err != nil {
 		if err == common.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
