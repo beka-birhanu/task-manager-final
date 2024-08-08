@@ -161,3 +161,32 @@ func (u *User) IsAdmin() bool {
 	return u.isAdmin
 }
 
+// UpdateUsername updates the user's username after validating it.
+func (u *User) UpdateUsername(newUsername string) error {
+	if err := validateUsername(newUsername); err != nil {
+		return err
+	}
+	u.username = newUsername
+	return nil
+}
+
+// UpdatePassword updates the user's password after validating its strength.
+// It uses the provided PasswordHasher to hash the new password.
+func (u *User) UpdatePassword(newPassword string, passwordHasher hash.IService) error {
+	if err := validatePassword(newPassword); err != nil {
+		return err
+	}
+
+	hashedPassword, err := passwordHasher.Hash(newPassword)
+	if err != nil {
+		return err
+	}
+
+	u.passwordHash = hashedPassword
+	return nil
+}
+
+// UpdateAdminStatus updates the user's administrative status.
+func (u *User) UpdateAdminStatus(isAdmin bool) {
+	u.isAdmin = isAdmin
+}
