@@ -1,4 +1,4 @@
-package data
+package taskrepo
 
 import (
 	"context"
@@ -12,15 +12,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// TaskRepo represents a Repo for managing tasks.
-type TaskRepo struct {
+// Repo represents a Repo for managing tasks.
+type Repo struct {
 	collection *mongo.Collection
 }
 
-// NewTaskRepo creates a new TaskRepo.
-func NewTaskRepo(client *mongo.Client, dbName, collectionName string) *TaskRepo {
+// New creates a new TaskRepo.
+func New(client *mongo.Client, dbName, collectionName string) *Repo {
 	collection := client.Database(dbName).Collection(collectionName)
-	return &TaskRepo{
+	return &Repo{
 		collection: collection,
 	}
 }
@@ -31,7 +31,7 @@ func createScopedContext() (context.Context, context.CancelFunc) {
 }
 
 // Add adds a new task to the collection. Returns an error if there is an ID conflict.
-func (s *TaskRepo) Add(title, description, status string, dueDate time.Time) (*taskmodel.Task, error) {
+func (s *Repo) Add(title, description, status string, dueDate time.Time) (*taskmodel.Task, error) {
 	ctx, cancel := createScopedContext()
 	defer cancel()
 
@@ -62,7 +62,7 @@ func (s *TaskRepo) Add(title, description, status string, dueDate time.Time) (*t
 }
 
 // Update updates an existing task. Returns an error if the task is not found.
-func (s *TaskRepo) Update(id uuid.UUID, title, description, status string, dueDate time.Time) (*taskmodel.Task, error) {
+func (s *Repo) Update(id uuid.UUID, title, description, status string, dueDate time.Time) (*taskmodel.Task, error) {
 	ctx, cancel := createScopedContext()
 	defer cancel()
 
@@ -94,7 +94,7 @@ func (s *TaskRepo) Update(id uuid.UUID, title, description, status string, dueDa
 }
 
 // Delete removes a task by ID. Returns an error if the task is not found.
-func (s *TaskRepo) Delete(id uuid.UUID) error {
+func (s *Repo) Delete(id uuid.UUID) error {
 	ctx, cancel := createScopedContext()
 	defer cancel()
 
@@ -110,7 +110,7 @@ func (s *TaskRepo) Delete(id uuid.UUID) error {
 }
 
 // GetAll returns a list of pointers to all tasks.
-func (s *TaskRepo) GetAll() ([]*taskmodel.Task, error) {
+func (s *Repo) GetAll() ([]*taskmodel.Task, error) {
 	ctx, cancel := createScopedContext()
 	defer cancel()
 
@@ -135,7 +135,7 @@ func (s *TaskRepo) GetAll() ([]*taskmodel.Task, error) {
 }
 
 // GetSingle returns a task by ID. Returns an error if the task is not found.
-func (s *TaskRepo) GetSingle(id uuid.UUID) (*taskmodel.Task, error) {
+func (s *Repo) GetSingle(id uuid.UUID) (*taskmodel.Task, error) {
 	ctx, cancel := createScopedContext()
 	defer cancel()
 

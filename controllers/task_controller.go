@@ -11,11 +11,11 @@ import (
 )
 
 type TaskController struct {
-	taskService common.ITaskService
+	taskService common.ITaskRepo
 }
 
 // NewTaskController creates a new TaskController with the given task service.
-func NewTaskController(taskService common.ITaskService) *TaskController {
+func NewTaskController(taskService common.ITaskRepo) *TaskController {
 	return &TaskController{
 		taskService: taskService,
 	}
