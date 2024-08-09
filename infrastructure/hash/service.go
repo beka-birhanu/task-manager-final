@@ -22,6 +22,7 @@ import (
 	"errors"
 	"sync"
 
+	ihash "github.com/beka-birhanu/domain/i_hash"
 	"golang.org/x/crypto/pbkdf2"
 )
 
@@ -38,6 +39,9 @@ var (
 	instance *Service
 	once     sync.Once
 )
+
+// Ensure Service implements ihash.Service.
+var _ ihash.Service = &Service{}
 
 // SingletonService returns a singleton instance of the hash Service.
 func SingletonService() *Service {
@@ -83,4 +87,3 @@ func (hs *Service) Match(hashedWord, plainWord string) (bool, error) {
 
 	return true, nil
 }
-
