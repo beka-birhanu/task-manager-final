@@ -1,9 +1,26 @@
+/*
+Package taskmodel provides the `Task` aggregate, which represents a task with
+a title, description, due date, and status. The package includes functionality
+for creating, updating, and converting tasks to and from BSON format for MongoDB operations.
+
+Key Components:
+  - Task: Represents a task with an ID, title, description, due date, and status.
+  - TaskConfig: Holds parameters for creating or updating a Task.
+  - New: Creates a new Task with validation and generates a unique ID.
+  - TaskBSON: Represents the BSON format of a Task for MongoDB operations.
+  - ToBSON: Converts a Task to its BSON representation.
+  - FromBSON: Converts a BSON representation back to a Task.
+
+Dependencies:
+- github.com/google/uuid: For generating unique task IDs.
+- github.com/beka-birhanu/errors: For handling validation errors.
+*/
 package taskmodel
 
 import (
 	"time"
 
-	err "github.com/beka-birhanu/errors"
+	err "github.com/beka-birhanu/domain/errors"
 	"github.com/google/uuid"
 )
 
@@ -13,7 +30,7 @@ const (
 	StatusPending    = "pending"
 )
 
-// Task represents a task with title, description, due date, status, and ID.
+// Task represents a task with an ID, title, description, due date, and status.
 type Task struct {
 	id          uuid.UUID
 	title       string
@@ -127,7 +144,7 @@ func (t *Task) DueDate() time.Time {
 
 // Status returns the task's status.
 func (t *Task) Status() string {
-	return string(t.status)
+	return t.status
 }
 
 // Update updates the task's fields with the provided configuration after validating the data.
@@ -142,3 +159,4 @@ func (t *Task) Update(config TaskConfig) error {
 	t.status = config.Status
 	return nil
 }
+
