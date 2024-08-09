@@ -1,28 +1,26 @@
 /*
-Package usermodel defines the `User` aggregate, which represents an individual user,
-and includes methods for creating and managing users. It handles user creation,
-validation of usernames and passwords, and association with expenses.
+Package usermodel defines the `User` aggregate, representing an individual user with methods
+for creation and management. It handles user creation, username and password validation,
+and user-expense associations.
 
 Key Components:
-  - User: Represents a user with details such as username, password hash, and
-    associated role.
-  - Config: Holds the mandatory parameters required to create a new User.
-  - New: Creates a new User instance based on the provided configuration.
+  - User: Represents a user with details like username, password hash, and role.
+  - Config: Holds parameters required to create a new User.
+  - New: Creates a new User instance using the provided configuration.
   - ConfigBSON: Holds parameters for creating a User with an existing password hash.
-  - ToBSON: Creates a new User instance with the provided configuration where the
-    password is already hashed.
+  - ToBSON: Creates a User instance with a pre-hashed password.
 
 Dependencies:
-- github.com/google/uuid: Used for generating unique IDs.
-- github.com/nbutton23/zxcvbn-go: Used for password strength evaluation.
+- github.com/google/uuid: For generating unique IDs.
+- github.com/nbutton23/zxcvbn-go: For evaluating password strength.
 */
 package usermodel
 
 import (
 	"regexp"
 
-	"github.com/beka-birhanu/common/hash"
-	err "github.com/beka-birhanu/errors"
+	err "github.com/beka-birhanu/domain/errors"
+	"github.com/beka-birhanu/domain/i_hash"
 	"github.com/google/uuid"
 	"github.com/nbutton23/zxcvbn-go"
 )
@@ -47,7 +45,7 @@ type User struct {
 	isAdmin      bool
 }
 
-// User represents the aggregate user with private fields.
+// UserBSON represents the BSON version of the User for database storage.
 type UserBSON struct {
 	ID           uuid.UUID `bson:"_id"`
 	Username     string    `bson:"username"`
@@ -55,15 +53,15 @@ type UserBSON struct {
 	IsAdmin      bool      `bson:"isAdmin"`
 }
 
-// Config holds all mandatory parameters for creating a new User.
+// Config holds parameters for creating a new User.
 type Config struct {
 	Username       string
 	PlainPassword  string
 	IsAdmin        bool
-	PasswordHasher hash.IService
+	PasswordHasher ihash.Service
 }
 
-// ConfigBSON holds all parameters for creating a User with an existing password hash.
+// ConfigBSON holds parameters for creating a User with an existing password hash.
 type ConfigBSON struct {
 	ID           uuid.UUID
 	Username     string
@@ -94,7 +92,7 @@ func New(config Config) (*User, error) {
 	}, nil
 }
 
-// ToBSON creates a new User with the provided configuration, where the password is already hashed.
+// ToBSON creates a new User with a pre-hashed password.
 func ToBSON(config ConfigBSON) (*User, error) {
 	if err := validateUsername(config.Username); err != nil {
 		return nil, err
@@ -118,7 +116,7 @@ func FromBSON(bsonUser *UserBSON) *User {
 	}
 }
 
-// validateUsername validates the username according to the defined rules.
+// validateUsername validates the username.
 func validateUsername(username string) error {
 	if len(username) < minUsernameLength {
 		return err.UsernameTooShort
@@ -156,12 +154,12 @@ func (u *User) PasswordHash() string {
 	return u.passwordHash
 }
 
-// IsAdmin returns whether the user has administrative privileges.
+// IsAdmin returns whether the user is an admin.
 func (u *User) IsAdmin() bool {
 	return u.isAdmin
 }
 
-// UpdateUsername updates the user's username after validating it.
+// UpdateUsername updates the user's username after validation.
 func (u *User) UpdateUsername(newUsername string) error {
 	if err := validateUsername(newUsername); err != nil {
 		return err
@@ -170,9 +168,8 @@ func (u *User) UpdateUsername(newUsername string) error {
 	return nil
 }
 
-// UpdatePassword updates the user's password after validating its strength.
-// It uses the provided PasswordHasher to hash the new password.
-func (u *User) UpdatePassword(newPassword string, passwordHasher hash.IService) error {
+// UpdatePassword updates the user's password after validation.
+func (u *User) UpdatePassword(newPassword string, passwordHasher ihash.Service) error {
 	if err := validatePassword(newPassword); err != nil {
 		return err
 	}
@@ -186,7 +183,8 @@ func (u *User) UpdatePassword(newPassword string, passwordHasher hash.IService) 
 	return nil
 }
 
-// UpdateAdminStatus updates the user's administrative status.
+// UpdateAdminStatus updates the user's admin status.
 func (u *User) UpdateAdminStatus(isAdmin bool) {
 	u.isAdmin = isAdmin
 }
+
