@@ -3,14 +3,15 @@ package irepo
 import (
 	"time"
 
-	"github.com/beka-birhanu/models/task"
+	taskmodel "github.com/beka-birhanu/domain/models/task"
+	taskrepo "github.com/beka-birhanu/infrastructure/repo/task"
 	"github.com/google/uuid"
 )
 
 type Task interface {
 
 	// Add adds a new task to the store. Returns an error if there is an ID conflict.
-	Add(title, description, status string, dueDate time.Time) (*taskmodel.Task, error)
+	Add(title, description, status string, dueDate time.Time) (*taskrepo.Repo, error)
 
 	// Update updates an existing task. Returns an error if the task is not found.
 	Update(id uuid.UUID, title, description, status string, dueDate time.Time) (*taskmodel.Task, error)

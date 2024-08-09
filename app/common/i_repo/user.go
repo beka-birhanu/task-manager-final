@@ -1,7 +1,7 @@
 package irepo
 
 import (
-	usermodel "github.com/beka-birhanu/models/user"
+	usermodel "github.com/beka-birhanu/domain/models/user"
 	"github.com/google/uuid"
 )
 
