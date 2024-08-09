@@ -9,4 +9,5 @@ type User interface {
 	Save(user *usermodel.User) error
 	ById(id uuid.UUID) (*usermodel.User, error)
 	ByUsername(username string) (*usermodel.User, error)
+	Count() (int64, error)
 }
