@@ -2,6 +2,7 @@ package userrepo
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/beka-birhanu/common"
@@ -45,8 +46,12 @@ func (u *UserRepo) Save(user *usermodel.User) error {
 	opts := options.Update().SetUpsert(true)
 	_, err := u.collection.UpdateOne(ctx, filter, update, opts)
 	if err != nil {
+		if mongo.IsDuplicateKeyError(err) {
+			return fmt.Errorf("conflict: username '%s' already exists", user.Username())
+		}
 		return err
 	}
+
 	return nil
 }
 
