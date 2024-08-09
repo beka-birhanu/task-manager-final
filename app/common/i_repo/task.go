@@ -2,8 +2,6 @@
 package irepo
 
 import (
-	"time"
-
 	taskmodel "github.com/beka-birhanu/domain/models/task"
 	"github.com/google/uuid"
 )
@@ -11,11 +9,8 @@ import (
 // Task defines methods to manage tasks in the store.
 type Task interface {
 
-	// Add adds a new task to the store.
-	Add(title, description, status string, dueDate time.Time) (*taskmodel.Task, error)
-
-	// Update modifies an existing task.
-	Update(id uuid.UUID, title, description, status string, dueDate time.Time) (*taskmodel.Task, error)
+	// Save adds a new task if it doesnot exist else updates the existing one.
+	Save(task *taskmodel.Task) error
 
 	// Delete removes a task by ID.
 	Delete(id uuid.UUID) error
