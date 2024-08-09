@@ -1,13 +1,18 @@
-// Package errdmn provides a simple way to create and handle custom domain errors.
-// It includes predefined error types like Validation, Conflict, Unexpected, NotFound, and Unauthorized,
-// which can be used to categorize errors in a consistent manner.
+// Package errdmn provides a mechanism for creating and handling custom domain errors.
+// It defines a set of predefined error types such as Validation, Conflict, Unexpected,
+// NotFound, and Unauthorized, allowing for consistent error categorization and handling across the application.
+//
+// Each error type is represented by a string constant, and the package includes functions to create
+// errors of these types with specific messages. The custom `Error` type implements the `IErr` interface,
+// which includes a `Type` method to retrieve the type of the error.
 package errdmn
 
 import "fmt"
 
-// IErr interface that should be implemented by all custom errors.
+// IErr is an interface that should be implemented by all custom errors.
+// It provides a method to retrieve the type of the error.
 type IErr interface {
-	// Type returns the type of the error.
+	// Type returns the type of the error as a string.
 	Type() string
 }
 
@@ -24,17 +29,21 @@ const (
 	// NotFound represents a resource not found error.
 	NotFound = "NotFound"
 
-	// Unauthorized represents an unauthorized error.
+	// Unauthorized represents an error for unauthorized access.
 	Unauthorized = "Unauthorized"
 )
 
 // Error represents a custom domain error with a type and message.
+// It implements the IErr interface.
 type Error struct {
-	kind    string
-	Message string
+	kind    string // The type of the error (e.g., Validation, Conflict).
+	Message string // The error message providing details about the error.
 }
 
-// new creates a new Error with the given type and message.
+// Ensure Error implements the IErr interface.
+var _ IErr = &Error{}
+
+// It is used internally to construct errors of specific types.
 func new(errType, message string) *Error {
 	return &Error{kind: errType, Message: message}
 }
