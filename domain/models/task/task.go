@@ -20,7 +20,7 @@ package taskmodel
 import (
 	"time"
 
-	err "github.com/beka-birhanu/domain/errors"
+	errdmn "github.com/beka-birhanu/domain/errors"
 	"github.com/google/uuid"
 )
 
@@ -98,16 +98,16 @@ func New(config TaskConfig) (*Task, error) {
 // validateTaskConfig checks if the provided task configuration is valid.
 func validateTaskConfig(config TaskConfig) error {
 	if config.Title == "" {
-		return err.ErrTitleEmpty
+		return errdmn.TitleEmpty
 	}
 	if config.Description == "" {
-		return err.ErrDescriptionEmpty
+		return errdmn.DescriptionEmpty
 	}
 	if config.DueDate.IsZero() {
-		return err.ErrDueDateZero
+		return errdmn.DueDateZero
 	}
 	if !isValidStatus(config.Status) {
-		return err.ErrInvalidStatus
+		return errdmn.InvalidStatus
 	}
 	return nil
 }

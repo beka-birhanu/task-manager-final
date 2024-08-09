@@ -19,7 +19,7 @@ package usermodel
 import (
 	"regexp"
 
-	err "github.com/beka-birhanu/domain/errors"
+	errdmn "github.com/beka-birhanu/domain/errors"
 	"github.com/beka-birhanu/domain/i_hash"
 	"github.com/google/uuid"
 	"github.com/nbutton23/zxcvbn-go"
@@ -119,13 +119,13 @@ func FromBSON(bsonUser *UserBSON) *User {
 // validateUsername validates the username.
 func validateUsername(username string) error {
 	if len(username) < minUsernameLength {
-		return err.UsernameTooShort
+		return errdmn.UsernameTooShort
 	}
 	if len(username) > maxUsernameLength {
-		return err.UsernameTooLong
+		return errdmn.UsernameTooLong
 	}
 	if !usernameRegex.MatchString(username) {
-		return err.UsernameInvalidFormat
+		return errdmn.UsernameInvalidFormat
 	}
 	return nil
 }
@@ -134,7 +134,7 @@ func validateUsername(username string) error {
 func validatePassword(password string) error {
 	result := zxcvbn.PasswordStrength(password, nil)
 	if result.Score < minPasswordStrengthScore {
-		return err.WeakPassword
+		return errdmn.WeakPassword
 	}
 	return nil
 }
