@@ -33,8 +33,7 @@ type Repo struct {
 // Ensure Repo implements irepo.Task
 var _ irepo.Task = &Repo{}
 
-// New creates a new Repo for managing tasks with the given MongoDB client,
-// database name, and collection name.
+// New creates a new Repo for managing tasks with the given MongoDB client, database name, and collection name.
 func New(client *mongo.Client, dbName, collectionName string) *Repo {
 	collection := client.Database(dbName).Collection(collectionName)
 	return &Repo{
@@ -48,47 +47,36 @@ func createScopedContext() (context.Context, context.CancelFunc) {
 }
 
 // Add adds a new task to the collection. Returns an error if there is an ID conflict.
-func (r *Repo) Add(title, description, status string, dueDate time.Time) (*taskmodel.Task, error) {
+func (r *Repo) Add(task *taskmodel.Task) error {
 	ctx, cancel := createScopedContext()
 	defer cancel()
 
-	taskConfig := taskmodel.TaskConfig{
-		Title:       title,
-		Description: description,
-		DueDate:     dueDate,
-		Status:      status,
-	}
+	taskBSON := task.ToBSON()
 
 	// Retry task creation if there's an ID conflict
 	for {
-		task, err := taskmodel.New(taskConfig)
-		if err != nil {
-			return nil, err
-		}
-
-		taskBSON := task.ToBSON()
-		_, err = r.collection.InsertOne(ctx, taskBSON)
+		_, err := r.collection.InsertOne(ctx, taskBSON)
 		if mongo.IsDuplicateKeyError(err) {
 			continue
 		} else if err != nil {
-			return nil, errdmn.NewUnexpected(err.Error())
+			return errdmn.NewUnexpected(err.Error())
 		}
-		return task, nil
+		return nil
 	}
 }
 
 // Update updates an existing task. Returns an error if the task is not found.
-func (r *Repo) Update(id uuid.UUID, title, description, status string, dueDate time.Time) (*taskmodel.Task, error) {
+func (r *Repo) Update(task *taskmodel.Task) error {
 	ctx, cancel := createScopedContext()
 	defer cancel()
 
-	filter := bson.M{"_id": id}
+	filter := bson.M{"_id": task.ID}
 	update := bson.M{
 		"$set": bson.M{
-			"title":       title,
-			"description": description,
-			"dueDate":     dueDate,
-			"status":      status,
+			"title":       task.Title,
+			"description": task.Description,
+			"dueDate":     task.DueDate,
+			"status":      task.Status,
 			"updatedAt":   time.Now(),
 		},
 	}
@@ -96,17 +84,11 @@ func (r *Repo) Update(id uuid.UUID, title, description, status string, dueDate t
 	result := r.collection.FindOneAndUpdate(ctx, filter, update, options.FindOneAndUpdate().SetReturnDocument(options.After))
 	if result.Err() != nil {
 		if result.Err() == mongo.ErrNoDocuments {
-			return nil, errdmn.TaskNotFound
+			return errdmn.TaskNotFound
 		}
-		return nil, errdmn.NewUnexpected(result.Err().Error())
+		return errdmn.NewUnexpected(result.Err().Error())
 	}
-
-	var taskBSON taskmodel.TaskBSON
-	if err := result.Decode(&taskBSON); err != nil {
-		return nil, errdmn.NewUnexpected(err.Error())
-	}
-	task := taskmodel.FromBSON(&taskBSON)
-	return task, nil
+	return nil
 }
 
 // Delete removes a task by ID. Returns an error if the task is not found.
