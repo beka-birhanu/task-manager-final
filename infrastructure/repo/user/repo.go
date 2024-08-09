@@ -1,12 +1,23 @@
+/*
+Package userrepo provides methods for managing user models in a MongoDB collection.
+
+It supports saving, retrieving by ID or username, and counting users. Errors related to
+user operations are handled using custom domain-specific errors.
+
+Dependencies:
+- go.mongodb.org/mongo-driver/mongo: MongoDB driver for Go.
+- github.com/google/uuid: UUID generation for user IDs.
+- github.com/beka-birhanu/domain/errors: Custom domain errors.
+- github.com/beka-birhanu/domain/models/user: User model definitions.
+*/
 package userrepo
 
 import (
 	"context"
-	"fmt"
 	"time"
 
-	"github.com/beka-birhanu/common"
-	usermodel "github.com/beka-birhanu/models/user"
+	errdmn "github.com/beka-birhanu/domain/errors"
+	usermodel "github.com/beka-birhanu/domain/models/user"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -47,15 +58,16 @@ func (u *UserRepo) Save(user *usermodel.User) error {
 	_, err := u.collection.UpdateOne(ctx, filter, update, opts)
 	if err != nil {
 		if mongo.IsDuplicateKeyError(err) {
-			return fmt.Errorf("conflict: username '%s' already exists", user.Username())
+			return errdmn.UsernameConflict
 		}
-		return err
+		return errdmn.NewUnexpected(err.Error())
 	}
 
 	return nil
 }
 
 // ById retrieves a user by their ID.
+// Returns an error if the user is not found or if an unexpected error occurs.
 func (u *UserRepo) ById(id uuid.UUID) (*usermodel.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -64,14 +76,15 @@ func (u *UserRepo) ById(id uuid.UUID) (*usermodel.User, error) {
 	var userBSON usermodel.UserBSON
 	if err := u.collection.FindOne(ctx, filter).Decode(&userBSON); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, common.ErrNotFound
+			return nil, errdmn.UserNotFound
 		}
-		return nil, err
+		return nil, errdmn.NewUnexpected(err.Error())
 	}
 	return usermodel.FromBSON(&userBSON), nil
 }
 
 // ByUsername retrieves a user by their username.
+// Returns an error if the user is not found or if an unexpected error occurs.
 func (u *UserRepo) ByUsername(username string) (*usermodel.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -80,16 +93,22 @@ func (u *UserRepo) ByUsername(username string) (*usermodel.User, error) {
 	var userBSON usermodel.UserBSON
 	if err := u.collection.FindOne(ctx, filter).Decode(&userBSON); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, common.ErrNotFound
+			return nil, errdmn.UserNotFound
 		}
-		return nil, err
+		return nil, errdmn.NewUnexpected(err.Error())
 	}
 	return usermodel.FromBSON(&userBSON), nil
 }
 
+// Count returns the total number of users in the repository.
 func (u *UserRepo) Count() (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	return u.collection.CountDocuments(ctx, bson.D{})
+	count, err := u.collection.CountDocuments(ctx, bson.D{})
+	if err != nil {
+		return 0, errdmn.NewUnexpected(err.Error())
+	}
+	return count, nil
 }
+
