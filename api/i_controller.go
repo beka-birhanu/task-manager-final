@@ -1,7 +1,21 @@
-package common
+// Package api defines an interface for controllers to register routes
+// with different access levels.
+package api
 
 import "github.com/gin-gonic/gin"
 
+// IController outlines methods for route registration:
+// - Public: No authentication required.
+// - Protected: Requires authentication.
+// - Privileged: Requires additional role-based authorization.
 type IController interface {
-	Register(route *gin.RouterGroup)
+	// RegisterPublic sets up public routes.
+	RegisterPublic(route *gin.RouterGroup)
+
+	// RegisterProtected sets up routes that require authentication.
+	RegisterProtected(route *gin.RouterGroup)
+
+	// RegisterPrivileged sets up routes with additional role-based authorization.
+	RegisterPrivileged(route *gin.RouterGroup)
 }
+
