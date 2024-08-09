@@ -6,12 +6,13 @@ import (
 
 	taskcontrollers "github.com/beka-birhanu/controllers/task"
 	usercontroller "github.com/beka-birhanu/controllers/user"
-	taskrepo "github.com/beka-birhanu/data/task"
-	userrepo "github.com/beka-birhanu/data/user"
+	taskrepo "github.com/beka-birhanu/infrastructure/repo/task"
+	userrepo "github.com/beka-birhanu/infrastructure/repo/user"
 	"github.com/beka-birhanu/router"
 	"github.com/beka-birhanu/service/hash"
 	"github.com/beka-birhanu/service/jwt"
 	usersvc "github.com/beka-birhanu/service/user"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -34,7 +35,25 @@ func main() {
 	if err := client.Ping(context.TODO(), nil); err != nil {
 		log.Fatalf("Error pinging MongoDB server: %v", err)
 	}
+	// Choose the database and collection
+	database := client.Database("taskdb")
+	usersCollection := database.Collection("users")
 
+	// Define the index model
+	indexModel := mongo.IndexModel{
+		Keys: bson.M{
+			"username": 1, // 1 for ascending order
+		},
+		Options: options.Index().SetUnique(true), // Optional: Set the index to be unique
+	}
+
+	// Create the index
+	indexName, err := usersCollection.Indexes().CreateOne(context.TODO(), indexModel)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("Created index %s\n", indexName)
 	// Create a new task service instance
 	taskService := taskrepo.New(client, "taskdb", "tasks")
 
@@ -54,6 +73,7 @@ func main() {
 		HashSvc:  hashService,
 	})
 	usercontroller := usercontroller.New(usersvc)
+
 	// Create a new router instance with configuration
 	routerConfig := router.Config{
 		Addr:         addr,
