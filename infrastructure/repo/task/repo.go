@@ -16,6 +16,7 @@ import (
 	"context"
 	"time"
 
+	irepo "github.com/beka-birhanu/app/common/i_repo"
 	errdmn "github.com/beka-birhanu/domain/errors"
 	taskmodel "github.com/beka-birhanu/domain/models/task"
 	"github.com/google/uuid"
@@ -28,6 +29,9 @@ import (
 type Repo struct {
 	collection *mongo.Collection
 }
+
+// Ensure Repo implements irepo.Task
+var _ irepo.Task = &Repo{}
 
 // New creates a new Repo for managing tasks with the given MongoDB client,
 // database name, and collection name.
@@ -162,4 +166,3 @@ func (r *Repo) GetSingle(id uuid.UUID) (*taskmodel.Task, error) {
 	task := taskmodel.FromBSON(&taskBSON)
 	return task, nil
 }
-

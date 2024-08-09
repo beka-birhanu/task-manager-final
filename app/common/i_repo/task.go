@@ -5,7 +5,6 @@ import (
 	"time"
 
 	taskmodel "github.com/beka-birhanu/domain/models/task"
-	taskrepo "github.com/beka-birhanu/infrastructure/repo/task"
 	"github.com/google/uuid"
 )
 
@@ -13,7 +12,7 @@ import (
 type Task interface {
 
 	// Add adds a new task to the store.
-	Add(title, description, status string, dueDate time.Time) (*taskrepo.Repo, error)
+	Add(title, description, status string, dueDate time.Time) (*taskmodel.Task, error)
 
 	// Update modifies an existing task.
 	Update(id uuid.UUID, title, description, status string, dueDate time.Time) (*taskmodel.Task, error)
