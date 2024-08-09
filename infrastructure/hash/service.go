@@ -1,3 +1,18 @@
+/*
+Package hash provides a service for securely hashing and matching passwords
+using PBKDF2 with SHA-256. It includes a singleton service that ensures only one
+instance of the hashing service is created.
+
+Key Components:
+  - Service: Provides methods for hashing and matching passwords.
+  - SingletonService: Returns the singleton instance of the Service.
+  - Hash: Generates a secure hash for a given word.
+  - Match: Compares a plain text word to a hashed word to verify a match.
+
+Dependencies:
+- golang.org/x/crypto/pbkdf2: Used for key derivation.
+- crypto/sha256: Used as the hash function in PBKDF2.
+*/
 package hash
 
 import (
@@ -16,7 +31,7 @@ const (
 	keySize    = 32
 )
 
-// Service is an implementation of hash.IService for hashing and matching.
+// Service implements the hash.IService interface.
 type Service struct{}
 
 var (
@@ -25,7 +40,6 @@ var (
 )
 
 // SingletonService returns a singleton instance of the hash Service.
-// It ensures that only one instance of the Service is created.
 func SingletonService() *Service {
 	once.Do(func() {
 		instance = &Service{}
@@ -34,9 +48,6 @@ func SingletonService() *Service {
 }
 
 // Hash generates a hashed representation of the given word.
-// It creates a random salt, combines it with the word, and hashes the result
-// using PBKDF2 with SHA-256. The final result is the base64-encoded combination
-// of the salt and the hash.
 func (hs *Service) Hash(word string) (string, error) {
 	salt := make([]byte, saltSize)
 	if _, err := rand.Read(salt); err != nil {
@@ -44,23 +55,12 @@ func (hs *Service) Hash(word string) (string, error) {
 	}
 
 	hash := pbkdf2.Key([]byte(word), salt, iterations, keySize, sha256.New)
-
 	result := append(salt, hash...)
 
 	return base64.StdEncoding.EncodeToString(result), nil
 }
 
 // Match compares a plain text word to a hashed word to determine if they match.
-// It extracts the salt from the hashed word, re-hashes the plain text word with the same salt,
-// and compares the result to the hash part of the hashed word.
-//
-// Parameters:
-//   - hashedWord: The base64-encoded combination of salt and hash to be compared against.
-//   - plainWord: The plain text word to be hashed and compared.
-//
-// Returns:
-//   - A boolean indicating whether the plain text word matches the hashed word.
-//   - An error if the hashed word is not in the expected format.
 func (hs *Service) Match(hashedWord, plainWord string) (bool, error) {
 	hashedWordBytes, err := base64.StdEncoding.DecodeString(hashedWord)
 	if err != nil {
@@ -83,3 +83,4 @@ func (hs *Service) Match(hashedWord, plainWord string) (bool, error) {
 
 	return true, nil
 }
+
