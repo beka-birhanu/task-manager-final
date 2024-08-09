@@ -54,7 +54,15 @@ func NewService(cfg Config) *Service {
 }
 
 func (s *Service) Register(cmd *AuthCommand) (*AuthResult, error) {
-	user, err := createUser(cmd, s.hashSvc)
+	var isAdmin bool
+	count, err := s.userRepo.Count()
+	if err != nil {
+		return nil, err
+	} else if count == 0 {
+		isAdmin = true
+	}
+
+	user, err := createUser(cmd, s.hashSvc, isAdmin)
 	if err != nil {
 		return nil, fmt.Errorf("creating new user failed: %w", err)
 	}
@@ -105,10 +113,11 @@ func (s *Service) Promote(username string) error {
 	return err
 }
 
-func createUser(cmd *AuthCommand, hashSvc hash.IService) (*usermodel.User, error) {
+func createUser(cmd *AuthCommand, hashSvc hash.IService, isAdmin bool) (*usermodel.User, error) {
 	cfg := usermodel.Config{
 		Username:       cmd.Username,
 		PlainPassword:  cmd.Password,
+		IsAdmin:        isAdmin,
 		PasswordHasher: hashSvc,
 	}
 	return usermodel.New(cfg)
