@@ -3,9 +3,13 @@
 // which can be used to categorize errors in a consistent manner.
 package errdmn
 
-import (
-	"fmt"
-)
+import "fmt"
+
+// IErr interface that should be implemented by all custom errors.
+type IErr interface {
+	// Type returns the type of the error.
+	Type() string
+}
 
 const (
 	// Validation represents a validation error.
@@ -31,7 +35,7 @@ type Error struct {
 }
 
 // new creates a new Error with the given type and message.
-func new(errType string, message string) *Error {
+func new(errType, message string) *Error {
 	return &Error{kind: errType, Message: message}
 }
 
@@ -69,3 +73,4 @@ func NewNotFound(message string) *Error {
 func NewUnauthorized(message string) *Error {
 	return new(Unauthorized, message)
 }
+
