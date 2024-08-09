@@ -72,8 +72,8 @@ func FromBSON(bson *TaskBSON) *Task {
 	}
 }
 
-// TaskConfig represents the configuration for creating or updating a Task.
-type TaskConfig struct {
+// Config represents the configuration for creating or updating a Task.
+type Config struct {
 	Title       string
 	Description string
 	DueDate     time.Time
@@ -81,8 +81,8 @@ type TaskConfig struct {
 }
 
 // New creates a new Task with the given configuration, validates its properties, and generates an ID.
-func New(config TaskConfig) (*Task, error) {
-	if err := validateTaskConfig(config); err != nil {
+func New(config Config) (*Task, error) {
+	if err := validateConfig(config); err != nil {
 		return nil, err
 	}
 
@@ -95,8 +95,8 @@ func New(config TaskConfig) (*Task, error) {
 	}, nil
 }
 
-// validateTaskConfig checks if the provided task configuration is valid.
-func validateTaskConfig(config TaskConfig) error {
+// validateConfig checks if the provided task configuration is valid.
+func validateConfig(config Config) error {
 	if config.Title == "" {
 		return errdmn.TitleEmpty
 	}
@@ -148,8 +148,8 @@ func (t *Task) Status() string {
 }
 
 // Update updates the task's fields with the provided configuration after validating the data.
-func (t *Task) Update(config TaskConfig) error {
-	if err := validateTaskConfig(config); err != nil {
+func (t *Task) Update(config Config) error {
+	if err := validateConfig(config); err != nil {
 		return err
 	}
 
@@ -159,4 +159,3 @@ func (t *Task) Update(config TaskConfig) error {
 	t.status = config.Status
 	return nil
 }
-

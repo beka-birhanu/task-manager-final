@@ -46,27 +46,8 @@ func createScopedContext() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), 10*time.Second)
 }
 
-// Add adds a new task to the collection. Returns an error if there is an ID conflict.
-func (r *Repo) Add(task *taskmodel.Task) error {
-	ctx, cancel := createScopedContext()
-	defer cancel()
-
-	taskBSON := task.ToBSON()
-
-	// Retry task creation if there's an ID conflict
-	for {
-		_, err := r.collection.InsertOne(ctx, taskBSON)
-		if mongo.IsDuplicateKeyError(err) {
-			continue
-		} else if err != nil {
-			return errdmn.NewUnexpected(err.Error())
-		}
-		return nil
-	}
-}
-
-// Update updates an existing task. Returns an error if the task is not found.
-func (r *Repo) Update(task *taskmodel.Task) error {
+// Save saves a task to the collection. If the task exists, it updates it; otherwise, it adds a new task.
+func (r *Repo) Save(task *taskmodel.Task) error {
 	ctx, cancel := createScopedContext()
 	defer cancel()
 
@@ -81,13 +62,13 @@ func (r *Repo) Update(task *taskmodel.Task) error {
 		},
 	}
 
-	result := r.collection.FindOneAndUpdate(ctx, filter, update, options.FindOneAndUpdate().SetReturnDocument(options.After))
-	if result.Err() != nil {
-		if result.Err() == mongo.ErrNoDocuments {
-			return errdmn.TaskNotFound
-		}
-		return errdmn.NewUnexpected(result.Err().Error())
+	opts := options.Update().SetUpsert(true)
+	_, err := r.collection.UpdateOne(ctx, filter, update, opts)
+
+	if err != nil {
+		return errdmn.NewUnexpected(err.Error())
 	}
+
 	return nil
 }
 
