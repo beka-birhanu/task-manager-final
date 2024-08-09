@@ -16,6 +16,7 @@ import (
 	"context"
 	"time"
 
+	irepo "github.com/beka-birhanu/app/common/i_repo"
 	errdmn "github.com/beka-birhanu/domain/errors"
 	usermodel "github.com/beka-birhanu/domain/models/user"
 	"github.com/google/uuid"
@@ -24,15 +25,18 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// UserRepo handles the persistence of user models.
-type UserRepo struct {
+// Repo handles the persistence of user models.
+type Repo struct {
 	collection *mongo.Collection
 }
 
-// NewUserRepo creates a new UserRepo with the given MongoDB client, database name, and collection name.
-func NewUserRepo(client *mongo.Client, dbName, collectionName string) *UserRepo {
+// Ensure Repo implements irepo.User.
+var _ irepo.User = &Repo{}
+
+// NewRepo creates a new UserRepo with the given MongoDB client, database name, and collection name.
+func NewRepo(client *mongo.Client, dbName, collectionName string) *Repo {
 	collection := client.Database(dbName).Collection(collectionName)
-	return &UserRepo{
+	return &Repo{
 		collection: collection,
 	}
 }
@@ -40,7 +44,7 @@ func NewUserRepo(client *mongo.Client, dbName, collectionName string) *UserRepo 
 // Save inserts or updates a user in the repository.
 // If the user already exists, it updates the existing record.
 // If the user does not exist, it adds a new record.
-func (u *UserRepo) Save(user *usermodel.User) error {
+func (u *Repo) Save(user *usermodel.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -68,7 +72,7 @@ func (u *UserRepo) Save(user *usermodel.User) error {
 
 // ById retrieves a user by their ID.
 // Returns an error if the user is not found or if an unexpected error occurs.
-func (u *UserRepo) ById(id uuid.UUID) (*usermodel.User, error) {
+func (u *Repo) ById(id uuid.UUID) (*usermodel.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -85,7 +89,7 @@ func (u *UserRepo) ById(id uuid.UUID) (*usermodel.User, error) {
 
 // ByUsername retrieves a user by their username.
 // Returns an error if the user is not found or if an unexpected error occurs.
-func (u *UserRepo) ByUsername(username string) (*usermodel.User, error) {
+func (u *Repo) ByUsername(username string) (*usermodel.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -101,7 +105,7 @@ func (u *UserRepo) ByUsername(username string) (*usermodel.User, error) {
 }
 
 // Count returns the total number of users in the repository.
-func (u *UserRepo) Count() (int64, error) {
+func (u *Repo) Count() (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -111,4 +115,3 @@ func (u *UserRepo) Count() (int64, error) {
 	}
 	return count, nil
 }
-
