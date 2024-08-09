@@ -23,7 +23,7 @@ func New(taskService irepo.Task) *Controller {
 }
 
 // Register registers the task routes.
-func (c *Controller) Register(route gin.RouterGroup) {
+func (c *Controller) Register(route *gin.RouterGroup) {
 	tasks := route.Group("/tasks")
 	{
 		tasks.POST("", c.addTask)
