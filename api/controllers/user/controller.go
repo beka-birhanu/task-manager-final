@@ -3,82 +3,46 @@ package usercontroller
 import (
 	"net/http"
 
-	"github.com/beka-birhanu/controllers/user/dto"
-	usersvc "github.com/beka-birhanu/service/user"
+	icmd "github.com/beka-birhanu/app/common/cqrs/command"
+	promotcmd "github.com/beka-birhanu/app/user/admin_status/command"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
-type UserController struct {
-	userSvc *usersvc.Service
+type Controller struct {
+	promotHandler icmd.IHandler[*promotcmd.Command, bool]
 }
 
-func New(userService *usersvc.Service) *UserController {
-	return &UserController{userSvc: userService}
+type Config struct {
+	PromotHandler icmd.IHandler[*promotcmd.Command, bool]
 }
 
-func (c *UserController) Register(route *gin.RouterGroup) {
+func New(config Config) *Controller {
+	return &Controller{
+		promotHandler: config.PromotHandler,
+	}
+}
+
+func (c *Controller) RegisterPublic(route *gin.RouterGroup) {}
+
+func (c *Controller) RegisterProtected(route *gin.RouterGroup) {}
+
+func (c *Controller) RegisterPrivilaged(route *gin.RouterGroup) {
 	user := route.Group("/users")
 	{
-		user.POST("/register", c.addUser)
-		user.POST("/login", c.login)
 		user.PATCH("/:username/promot", c.promot)
 	}
 }
 
-func (c *UserController) addUser(ctx *gin.Context) {
-	var request dto.AuthRequest
-
-	if err := ctx.ShouldBind(&request); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	result, err := c.userSvc.Register(&usersvc.AuthCommand{
-		Username: request.Username,
-		Password: request.Password,
-	})
-
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	respone := dto.NewAuthResponse(result)
-	ctx.SetCookie("accessToken", result.Token, 24*60, "/", ctx.Request.Host, true, true)
-	ctx.JSON(http.StatusOK, respone)
-}
-
-func (c *UserController) login(ctx *gin.Context) {
-	var request dto.AuthRequest
-
-	if err := ctx.ShouldBind(&request); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	result, err := c.userSvc.SignIn(&usersvc.AuthCommand{
-		Username: request.Username,
-		Password: request.Password,
-	})
-
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	respone := dto.NewAuthResponse(result)
-	ctx.SetCookie("accessToken", result.Token, 24*60, "/", ctx.Request.Host, true, true)
-	ctx.JSON(http.StatusOK, respone)
-}
-
-func (c *UserController) promot(ctx *gin.Context) {
+func (c *Controller) promot(ctx *gin.Context) {
 	username, ok := ctx.Params.Get("username")
 	if !ok {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "username missing"})
 		return
 	}
 
-	if err := c.userSvc.Promote(username); err != nil {
+	_, err := c.promotHandler.Handle(promotcmd.NewCommand(username, uuid.New()))
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

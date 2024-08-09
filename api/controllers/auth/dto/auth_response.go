@@ -1,6 +1,6 @@
 package dto
 
-import usersvc "github.com/beka-birhanu/service/user"
+import authresult "github.com/beka-birhanu/app/user/auth/common"
 
 type AuthResponse struct {
 	ID       string `json:"id"`
@@ -9,6 +9,9 @@ type AuthResponse struct {
 
 // FromAuthResult extracts the info for the login response from the given
 // auth.Result and map them to new LoginResponse
-func NewAuthResponse(authResult *usersvc.AuthResult) *AuthResponse {
-	return &AuthResponse{ID: authResult.ID.String(), Username: authResult.Username}
+func NewAuthResponse(authResult *authresult.Result) *AuthResponse {
+	return &AuthResponse{
+		ID:       authResult.ID.String(),
+		Username: authResult.Username,
+	}
 }
