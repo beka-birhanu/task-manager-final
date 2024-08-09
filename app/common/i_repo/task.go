@@ -1,3 +1,4 @@
+// Package irepo provides interfaces for task repository operations.
 package irepo
 
 import (
@@ -8,22 +9,22 @@ import (
 	"github.com/google/uuid"
 )
 
+// Task defines methods to manage tasks in the store.
 type Task interface {
 
-	// Add adds a new task to the store. Returns an error if there is an ID conflict.
+	// Add adds a new task to the store.
 	Add(title, description, status string, dueDate time.Time) (*taskrepo.Repo, error)
 
-	// Update updates an existing task. Returns an error if the task is not found.
+	// Update modifies an existing task.
 	Update(id uuid.UUID, title, description, status string, dueDate time.Time) (*taskmodel.Task, error)
 
-	// Delete removes a task by ID. Returns an error if the task is not found.
+	// Delete removes a task by ID.
 	Delete(id uuid.UUID) error
 
-	// GetAll retrieves all tasks from the MongoDB collection.
-	//
-	// Returns a slice of pointers to `taskmodel.Task` and an error if there is a connection or query issue with database.
+	// GetAll retrieves all tasks.
 	GetAll() ([]*taskmodel.Task, error)
 
-	// GetSingle returns a task by ID. Returns an error if the task is not found.
+	// GetSingle returns a task by ID.
 	GetSingle(id uuid.UUID) (*taskmodel.Task, error)
 }
+
