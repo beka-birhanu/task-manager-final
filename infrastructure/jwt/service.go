@@ -20,16 +20,21 @@ import (
 	"errors"
 	"time"
 
+	ijwt "github.com/beka-birhanu/app/common/i_jwt"
 	usermodel "github.com/beka-birhanu/domain/models/user"
 	"github.com/dgrijalva/jwt-go"
 )
 
 // Service handles JWT operations.
+// Implements ijwt.Service.
 type Service struct {
 	secretKey string
 	issuer    string
 	expTime   time.Duration
 }
+
+// Ensure Service implements ijwt.Service.
+var _ ijwt.Service = &Service{}
 
 // Config holds JWT service configuration.
 type Config struct {
@@ -82,4 +87,3 @@ func (s *Service) getSigningKey(token *jwt.Token) (interface{}, error) {
 	}
 	return []byte(s.secretKey), nil
 }
-
