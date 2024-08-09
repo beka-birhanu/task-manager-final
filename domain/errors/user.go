@@ -1,4 +1,4 @@
-package err
+package errdmn
 
 // Validation errors
 var (

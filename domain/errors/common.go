@@ -1,7 +1,7 @@
-// Package err provides a simple way to create and handle custom domain errors.
+// Package errdmn provides a simple way to create and handle custom domain errors.
 // It includes predefined error types like Validation, Conflict, Unexpected, NotFound, and Unauthorized,
 // which can be used to categorize errors in a consistent manner.
-package err
+package errdmn
 
 import (
 	"fmt"
@@ -69,4 +69,3 @@ func NewNotFound(message string) *Error {
 func NewUnauthorized(message string) *Error {
 	return new(Unauthorized, message)
 }
-

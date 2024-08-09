@@ -1,17 +1,20 @@
-package err
+package errdmn
 
 // Validation errors
 var (
-	// ErrTitleEmpty indicates that the title cannot be empty.
-	ErrTitleEmpty = NewValidation("title cannot be empty")
+	// TitleEmpty indicates that the title cannot be empty.
+	TitleEmpty = NewValidation("title cannot be empty")
 
-	// ErrDescriptionEmpty indicates that the description cannot be empty.
-	ErrDescriptionEmpty = NewValidation("description cannot be empty")
+	// DescriptionEmpty indicates that the description cannot be empty.
+	DescriptionEmpty = NewValidation("description cannot be empty")
 
-	// ErrDueDateZero indicates that the due date cannot be zero.
-	ErrDueDateZero = NewValidation("due date cannot be zero")
+	// DueDateZero indicates that the due date cannot be zero.
+	DueDateZero = NewValidation("due date cannot be zero")
 
-	// ErrInvalidStatus indicates that the status is invalid.
-	ErrInvalidStatus = NewValidation("invalid status")
+	// InvalidStatus indicates that the status is invalid.
+	InvalidStatus = NewValidation("invalid status")
+
+	// TaskNotFound indicates that a task was not found.
+	TaskNotFound = NewValidation("task not found")
 )
 
