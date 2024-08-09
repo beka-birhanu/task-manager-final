@@ -1,10 +1,3 @@
-/*
-Package erruser defines user-related errors for the application.
-
-It provides a set of predefined errors related to user not-found, validation,
-conflicts, and unexpected issues. These errors are used throughout the application
-to handle various error conditions specific to user operations.
-*/
 package err
 
 // Validation errors
