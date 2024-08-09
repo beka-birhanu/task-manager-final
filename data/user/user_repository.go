@@ -81,3 +81,9 @@ func (u *UserRepo) ByUsername(username string) (*usermodel.User, error) {
 	}
 	return usermodel.FromBSON(&userBSON), nil
 }
+func (u *UserRepo) Count() (int64, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	return u.collection.CountDocuments(ctx, bson.D{})
+}
