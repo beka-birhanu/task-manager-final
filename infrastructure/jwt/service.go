@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	usermodel "github.com/beka-birhanu/models/user"
+	usermodel "github.com/beka-birhanu/domain/models/user"
 	"github.com/dgrijalva/jwt-go"
 )
 
