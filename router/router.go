@@ -12,6 +12,7 @@ type Router struct {
 	addr         string
 	baseURL      string
 	tasksHandler common.IController
+	userHandler  common.IController
 }
 
 // Config is the struct for configuring the Router.
@@ -19,6 +20,7 @@ type Config struct {
 	Addr         string
 	BaseURL      string
 	TasksHandler common.IController
+	UserHandler  common.IController
 }
 
 // NewRouter creates a new instance of Router with the given configuration.
@@ -27,6 +29,7 @@ func NewRouter(config Config) *Router {
 		addr:         config.Addr,
 		baseURL:      config.BaseURL,
 		tasksHandler: config.TasksHandler,
+		userHandler:  config.UserHandler,
 	}
 }
 
@@ -39,7 +42,8 @@ func (r *Router) Run() error {
 	{
 		v1 := api.Group("/v1")
 		{
-			r.tasksHandler.Register(*v1)
+			r.tasksHandler.Register(v1)
+			r.userHandler.Register(v1)
 		}
 	}
 
