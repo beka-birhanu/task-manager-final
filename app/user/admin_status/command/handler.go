@@ -13,25 +13,30 @@ type Handler struct {
 	userRepo irepo.User
 }
 
-// Promote promotes a user to admin status.
-func (h *Handler) Promote(cmd *Command) error {
+// New creates a new instance of the Handler with the provided user repository.
+func New(userRepo irepo.User) *Handler {
+	return &Handler{userRepo: userRepo}
+}
+
+// Promote promotes a user to admin status based on the provided command.
+func (h *Handler) Promote(cmd *Command) (bool, error) {
 	user, err := h.userRepo.ByUsername(cmd.Username)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	admin, err := h.userRepo.ById(cmd.PromoterID)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	user.UpdateAdminStatus(true)
 	if err := h.userRepo.Save(user); err != nil {
-		return err
+		return false, err
 	}
 
-	// TODO: Implement proper logging mechanism.
+	// TODO: Implement a proper logging mechanism.
 	log.Printf("Admin %v promoted user %v", admin.Username(), user.Username())
-	return nil
+	return true, nil
 }
 

@@ -8,3 +8,11 @@ type Command struct {
 	PromoterID uuid.UUID // ID of the user performing the promotion.
 }
 
+// NewCommand creates a new Command instance with the given username and promoter ID.
+func NewCommand(username string, promoterID uuid.UUID) *Command {
+	return &Command{
+		Username:   username,
+		PromoterID: promoterID,
+	}
+}
+
