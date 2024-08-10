@@ -47,7 +47,7 @@ func Authoriz(jwtService ijwt.Service, hasToBeAdmin bool) gin.HandlerFunc {
 
 		// Check if the user meets the required admin status.
 		isAdmin, ok := claims["is_admin"].(bool)
-		if !ok || isAdmin != hasToBeAdmin {
+		if !ok || (!isAdmin && hasToBeAdmin) {
 			c.Status(http.StatusForbidden) // Forbidden if admin status does not match.
 			c.Abort()
 			return
@@ -58,4 +58,3 @@ func Authoriz(jwtService ijwt.Service, hasToBeAdmin bool) gin.HandlerFunc {
 		c.Next()
 	}
 }
-
