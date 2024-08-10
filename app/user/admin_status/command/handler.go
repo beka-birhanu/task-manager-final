@@ -19,7 +19,7 @@ func New(userRepo irepo.User) *Handler {
 }
 
 // Promote promotes a user to admin status based on the provided command.
-func (h *Handler) Promote(cmd *Command) (bool, error) {
+func (h *Handler) Handle(cmd *Command) (bool, error) {
 	user, err := h.userRepo.ByUsername(cmd.Username)
 	if err != nil {
 		return false, err
