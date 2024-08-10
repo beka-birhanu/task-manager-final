@@ -45,7 +45,7 @@ func (c *Controller) RegisterProtected(route *gin.RouterGroup) {
 
 }
 
-func (c *Controller) RegisterPrivilaged(route *gin.RouterGroup) {}
+func (c *Controller) RegisterPrivileged(route *gin.RouterGroup) {}
 
 func (c *Controller) registerUser(ctx *gin.Context) {
 	var request dto.AuthRequest

@@ -27,7 +27,7 @@ func (c *Controller) RegisterPublic(route *gin.RouterGroup) {}
 
 func (c *Controller) RegisterProtected(route *gin.RouterGroup) {}
 
-func (c *Controller) RegisterPrivilaged(route *gin.RouterGroup) {
+func (c *Controller) RegisterPrivileged(route *gin.RouterGroup) {
 	user := route.Group("/users")
 	{
 		user.PATCH("/:username/promot", c.promot)
