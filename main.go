@@ -1,90 +1,136 @@
 package main
 
 import (
-	"context"
+	"fmt"
 	"log"
 
-	taskcontrollers "github.com/beka-birhanu/controllers/task"
-	usercontroller "github.com/beka-birhanu/controllers/user"
+	"github.com/beka-birhanu/api"
+	authcontroller "github.com/beka-birhanu/api/controllers/auth"
+	taskcontroller "github.com/beka-birhanu/api/controllers/task"
+	usercontroller "github.com/beka-birhanu/api/controllers/user"
+	"github.com/beka-birhanu/api/router"
+	addcmd "github.com/beka-birhanu/app/task/command/add"
+	deletecmd "github.com/beka-birhanu/app/task/command/delete"
+	updatecmd "github.com/beka-birhanu/app/task/command/update"
+	getqry "github.com/beka-birhanu/app/task/query/get"
+	getallqry "github.com/beka-birhanu/app/task/query/get_all"
+	promotcmd "github.com/beka-birhanu/app/user/admin_status/command"
+	registercmd "github.com/beka-birhanu/app/user/auth/command"
+	loginqry "github.com/beka-birhanu/app/user/auth/query"
+	"github.com/beka-birhanu/config"
+	"github.com/beka-birhanu/infrastructure/db"
+	"github.com/beka-birhanu/infrastructure/hash"
+	"github.com/beka-birhanu/infrastructure/jwt"
 	taskrepo "github.com/beka-birhanu/infrastructure/repo/task"
 	userrepo "github.com/beka-birhanu/infrastructure/repo/user"
-	"github.com/beka-birhanu/router"
-	"github.com/beka-birhanu/service/hash"
-	"github.com/beka-birhanu/service/jwt"
-	usersvc "github.com/beka-birhanu/service/user"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Configuration constants
-const (
-	addr    = ":8080"
-	baseURL = "/api"
-)
-
+// main is the entry point for the application.
+// It initializes the MongoDB client, services, controllers, and starts the HTTP server.
 func main() {
-	// Initialize MongoDB client
-	clientOptions := options.Client().ApplyURI("")
-	client, err := mongo.Connect(context.Background(), clientOptions)
-	if err != nil {
-		log.Fatalf("Error creating MongoDB client: %v", err)
+	cfg := config.Envs
+
+	// Initialize MongoDB client and perform migrations
+	mongoClient := initDB(cfg)
+
+	// Initialize services
+	userRepo, taskRepo, jwtService, hashService := initServices(cfg, mongoClient)
+
+	// Initialize controllers
+	userController := initUserController(userRepo)
+	authController := initAuthController(userRepo, jwtService, hashService)
+	taskController := initTaskController(taskRepo)
+
+	// Router configuration
+	routerConfig := router.Config{
+		Addr:        fmt.Sprintf(":%s", cfg.ServerPort),
+		BaseURL:     "/api",
+		Controllers: []api.IController{userController, taskController, authController},
+		JwtService:  jwtService,
 	}
+	r := router.NewRouter(routerConfig)
 
-	// Ping the MongoDB server to verify connection
-	if err := client.Ping(context.TODO(), nil); err != nil {
-		log.Fatalf("Error pinging MongoDB server: %v", err)
+	// Start the server
+	if err := r.Run(); err != nil {
+		log.Fatalf("Error starting server: %v", err)
 	}
-	// Choose the database and collection
-	database := client.Database("taskdb")
-	usersCollection := database.Collection("users")
+}
 
-	// Define the index model
-	indexModel := mongo.IndexModel{
-		Keys: bson.M{
-			"username": 1, // 1 for ascending order
-		},
-		Options: options.Index().SetUnique(true), // Optional: Set the index to be unique
-	}
+// initDB initializes the MongoDB client and performs any necessary database migrations.
+// It returns the MongoDB client instance.
+func initDB(cfg config.Config) *mongo.Client {
+	mongoClient := db.Connect(db.Config{
+		ConnectionString: cfg.DBConnectionString,
+	})
 
-	// Create the index
-	indexName, err := usersCollection.Indexes().CreateOne(context.TODO(), indexModel)
-	if err != nil {
-		log.Fatal(err)
-	}
+	db.Migrate(mongoClient, cfg.DBName)
 
-	log.Printf("Created index %s\n", indexName)
-	// Create a new task service instance
-	taskService := taskrepo.New(client, "taskdb", "tasks")
+	return mongoClient
+}
 
-	// Create a new task controller instance
-	taskController := taskcontrollers.New(taskService)
+// initServices initializes the necessary services for the application.
+// It returns the user repository, task repository, JWT service, and hash service.
+func initServices(cfg config.Config, mongoClient *mongo.Client) (*userrepo.Repo, *taskrepo.Repo, *jwt.Service, *hash.Service) {
+	userRepo := userrepo.NewRepo(mongoClient, cfg.DBName, "users")
+	taskRepo := taskrepo.New(mongoClient, cfg.DBName, "tasks")
 
 	jwtService := jwt.New(jwt.Config{
-		SecretKey: "not-so-secret-now-is-it?",
-		ExpTime:   1400,
+		SecretKey: cfg.JWTSecret,
+		Issuer:    cfg.ServerHost,
+		ExpTime:   cfg.JWTExpirationInSeconds,
 	})
 
 	hashService := hash.SingletonService()
-	userrepo := userrepo.NewUserRepo(client, "taskdb", "usres")
-	usersvc := usersvc.NewService(usersvc.Config{
-		UserRepo: userrepo,
+
+	return userRepo, taskRepo, jwtService, hashService
+}
+
+// initUserController initializes the user controller with the necessary handlers.
+// It returns the user controller instance.
+func initUserController(userRepo *userrepo.Repo) *usercontroller.Controller {
+	promotHandler := promotcmd.New(userRepo)
+
+	return usercontroller.New(usercontroller.Config{
+		PromotHandler: promotHandler,
+	})
+}
+
+// initAuthController initializes the authentication controller with the necessary handlers.
+// It returns the authentication controller instance.
+func initAuthController(userRepo *userrepo.Repo, jwtService *jwt.Service, hashService *hash.Service) *authcontroller.Controller {
+	signupHandler := registercmd.NewHandler(registercmd.Config{
+		UserRepo: userRepo,
 		JwtSvc:   jwtService,
 		HashSvc:  hashService,
 	})
-	usercontroller := usercontroller.New(usersvc)
 
-	// Create a new router instance with configuration
-	routerConfig := router.Config{
-		Addr:         addr,
-		BaseURL:      baseURL,
-		TasksHandler: taskController,
-		UserHandler:  usercontroller,
-	}
-	router := router.NewRouter(routerConfig)
+	loginHandler := loginqry.NewHandler(loginqry.Config{
+		UserRepo: userRepo,
+		JwtSvc:   jwtService,
+		HashSvc:  hashService,
+	})
 
-	// Run the server
-	if err := router.Run(); err != nil {
-		log.Fatalf("Error starting server: %v", err)
-	}
+	return authcontroller.New(authcontroller.Config{
+		RegisterHandler: signupHandler,
+		LoginHandler:    loginHandler,
+	})
+}
+
+// initTaskController initializes the task controller with the necessary handlers.
+// It returns the task controller instance.
+func initTaskController(taskRepo *taskrepo.Repo) *taskcontroller.Controller {
+	addHandler := addcmd.NewHandler(taskRepo)
+	updateHandler := updatecmd.NewHandler(taskRepo)
+	deleteHandler := deletecmd.New(taskRepo)
+	getAllHandler := getallqry.New(taskRepo)
+	getHandler := getqry.New(taskRepo)
+
+	return taskcontroller.New(taskcontroller.Config{
+		AddHandler:    addHandler,
+		UpdateHandler: updateHandler,
+		DeleteHandler: deleteHandler,
+		GetAllHandler: getAllHandler,
+		GetHandler:    getHandler,
+	})
 }
