@@ -17,8 +17,8 @@ func NewHandler(repo irepo.Task) *Handler {
 	return &Handler{repo: repo}
 }
 
-// HandleAdd processes the command to add a new task to the repository.
-func (h *Handler) HandleAdd(cmd *Command) (*taskmodel.Task, error) {
+// Handle processes the command to add a new task to the repository.
+func (h *Handler) Handle(cmd *Command) (*taskmodel.Task, error) {
 	task, err := taskmodel.New(taskmodel.Config{
 		Title:       cmd.title,
 		Description: cmd.description,
