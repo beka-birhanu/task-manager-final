@@ -29,7 +29,7 @@ type Router struct {
 type Config struct {
 	Addr        string            // Address to listen on
 	BaseURL     string            // Base URL for API routes
-	controllers []api.IController // List of controllers
+	Controllers []api.IController // List of controllers
 	JwtService  ijwt.Service      // JWT service
 }
 
@@ -39,7 +39,7 @@ func NewRouter(config Config) *Router {
 	return &Router{
 		addr:        config.Addr,
 		baseURL:     config.BaseURL,
-		controllers: config.controllers,
+		controllers: config.Controllers,
 		jwtService:  config.JwtService,
 	}
 }
@@ -86,4 +86,3 @@ func (r *Router) Run() error {
 	log.Println("Listening on", r.addr)
 	return router.Run(r.addr)
 }
-
