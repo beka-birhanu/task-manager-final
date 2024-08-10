@@ -1,176 +1,129 @@
-# Task Management API
+## Task Management API
 
-This API allows users to manage tasks. It provides endpoints to create, update, delete, and retrieve tasks.
+This API allows users to manage tasks and handle user authentication. It provides endpoints to create, update, delete, and retrieve tasks, along with user registration, login, and logout.
 
-## Endpoints
+### API Endpoints
 
-### Create a Task
+#### **Task Management**
 
-**URL:** `/tasks`
+- **Create Task**: `POST /api/v1/tasks`
 
-**Method:** `POST`
+  - **Request Body**:
 
-**Request Body:**
+    ```json
+    {
+      "title": "string",
+      "description": "string",
+      "dueDate": "string (ISO 8601 format)",
+      "status": "string"
+    }
+    ```
 
-```json
-{
-  "title": "string",
-  "description": "string",
-  "dueDate": "string (ISO 8601 format)",
-  "status": "string"
-}
-```
+  - **Response**:
+    - `201 Created`
+    - **Headers**: `Location: /api/v1/tasks/{id}`
 
-**Response:**
+- **Update Task**: `PUT /api/v1/tasks/{id}`
 
-- **Status:** `201 Created`
-- **Headers:**
-  - `Location`: The URL of the created task.
+  - **Path Parameters**: `{id}` (UUID)
+  - **Request Body**:
 
-**Errors:**
+    ```json
+    {
+      "title": "string",
+      "description": "string",
+      "dueDate": "string (ISO 8601 format)",
+      "status": "string"
+    }
+    ```
 
-- `400 Bad Request`: Invalid request data.
+  - **Response**: `200 OK`
 
-### Update a Task
+- **Delete Task**: `DELETE /api/v1/tasks/{id}`
 
-**URL:** `/tasks/{id}`
+  - **Path Parameters**: `{id}` (UUID)
+  - **Response**: `200 OK`
 
-**Method:** `PUT`
+- **Get All Tasks**: `GET /api/v1/tasks`
 
-**Path Parameters:**
+  - **Response**:
+    ```json
+    [
+      {
+        "id": "uuid",
+        "title": "string",
+        "description": "string",
+        "dueDate": "string (ISO 8601 format)",
+        "status": "string"
+      }
+    ]
+    ```
 
-- `id` (UUID): The ID of the task to update.
+- **Get Single Task**: `GET /api/v1/tasks/{id}`
+  - **Path Parameters**: `{id}` (UUID)
+  - **Response**:
+    ```json
+    {
+      "id": "uuid",
+      "title": "string",
+      "description": "string",
+      "dueDate": "string (ISO 8601 format)",
+      "status": "string"
+    }
+    ```
 
-**Request Body:**
+#### **User Management**
 
-```json
-{
-  "title": "string",
-  "description": "string",
-  "dueDate": "string (ISO 8601 format)",
-  "status": "string"
-}
-```
+- **Create User**: `POST /api/v1/users`
 
-**Response:**
+  - **Request Body**:
+    ```json
+    {
+      "username": "beka_birhanu",
+      "password": "************",
+      "isAdmin": true
+    }
+    ```
+  - **Response**: `201 Created`
 
-- **Status:** `200 OK`
+    ```json
+    {
+      "id": "00000000-0000-0000-0000-000000000000",
+      "username": "beka_birhanu",
+      "isAdmin": true
+    }
+    ```
 
-**Errors:**
+    **Headers**: `Set-Cookie: token=<token_value>; HttpOnly; Secure`
 
-- `400 Bad Request`: Invalid request data.
-- `404 Not Found`: Task not found.
+#### **Authentication**
 
-### Delete a Task
+- **Sign in**: `POST /api/v1/auth/login`
 
-**URL:** `/tasks/{id}`
+  - **Request Body**:
+    ```json
+    {
+      "username": "beka_birhanu",
+      "password": "************"
+    }
+    ```
+  - **Response**: `200 OK`
 
-**Method:** `DELETE`
+    ```json
+    {
+      "id": "00000000-0000-0000-0000-000000000000",
+      "username": "beka_birhanu",
+      "isAdmin": true
+    }
+    ```
 
-**Path Parameters:**
+    **Headers**: `Set-Cookie: token=<token_value>; HttpOnly; Secure`
 
-- `id` (UUID): The ID of the task to delete.
+- **Sign out**: `POST /api/v1/auth/logOut`
+  - **Headers**: `Cookie: token=<token_value>`
+  - **Response**: `204 No Content`
+    **Headers**: `Set-Cookie: token=; HttpOnly; Secure; Max-Age=0`
 
-**Response:**
+---
 
-- **Status:** `200 OK`
-
-**Errors:**
-
-- `400 Bad Request`: Invalid task ID.
-- `404 Not Found`: Task not found.
-
-### Get All Tasks
-
-**URL:** `/tasks`
-
-**Method:** `GET`
-
-**Response:**
-
-- **Status:** `200 OK`
-- **Body:**
-
-```json
-[
-  {
-    "id": "uuid",
-    "title": "string",
-    "description": "string",
-    "dueDate": "string (ISO 8601 format)",
-    "status": "string",
-    "createdAt": "string (ISO 8601 format)",
-    "updatedAt": "string (ISO 8601 format)"
-  }
-]
-```
-
-### Get a Single Task
-
-**URL:** `/tasks/{id}`
-
-**Method:** `GET`
-
-**Path Parameters:**
-
-- `id` (UUID): The ID of the task to retrieve.
-
-**Response:**
-
-- **Status:** `200 OK`
-- **Body:**
-
-```json
-{
-  "id": "uuid",
-  "title": "string",
-  "description": "string",
-  "dueDate": "string (ISO 8601 format)",
-  "status": "string",
-  "createdAt": "string (ISO 8601 format)",
-  "updatedAt": "string (ISO 8601 format)"
-}
-```
-
-**Errors:**
-
-- `400 Bad Request`: Invalid task ID.
-- `404 Not Found`: Task not found.
-
-## Models
-
-### AddTaskRequest
-
-```json
-{
-  "title": "string",
-  "description": "string",
-  "dueDate": "string (ISO 8601 format)",
-  "status": "string"
-}
-```
-
-### UpdateTaskRequest
-
-```json
-{
-  "title": "string",
-  "description": "string",
-  "dueDate": "string (ISO 8601 format)",
-  "status": "string"
-}
-```
-
-### TaskResponse
-
-```json
-{
-  "id": "uuid",
-  "title": "string",
-  "description": "string",
-  "dueDate": "string (ISO 8601 format)",
-  "status": "string",
-  "createdAt": "string (ISO 8601 format)",
-  "updatedAt": "string (ISO 8601 format)"
-}
-```
+This documentation reflects the updated API structure, including authentication and user management consistent with the other project you mentioned.
