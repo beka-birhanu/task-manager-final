@@ -4,18 +4,22 @@ import (
 	"fmt"
 	"net/http"
 
+	errapi "github.com/beka-birhanu/api/errors"
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+
+	basecontroller "github.com/beka-birhanu/api/controllers/base"
 	"github.com/beka-birhanu/api/controllers/task/dto"
 	icmd "github.com/beka-birhanu/app/common/cqrs/command"
 	addcmd "github.com/beka-birhanu/app/task/command/add"
 	updatecmd "github.com/beka-birhanu/app/task/command/update"
 	errdmn "github.com/beka-birhanu/domain/errors"
 	taskmodel "github.com/beka-birhanu/domain/models/task"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 // Controller handles HTTP requests related to tasks.
 type Controller struct {
+	basecontroller.BaseHandler
 	addHandler    icmd.IHandler[*addcmd.Command, *taskmodel.Task]
 	updateHandler icmd.IHandler[*updatecmd.Command, *taskmodel.Task]
 	deleteHandler icmd.IHandler[uuid.UUID, bool]
@@ -42,28 +46,25 @@ func New(config Config) *Controller {
 	}
 }
 
-// Register registers the task routes with CQRS handlers.
-func (c *Controller) Register(route *gin.RouterGroup) {
-
-}
+// RegisterPublic registers public routes.
 func (c *Controller) RegisterPublic(route *gin.RouterGroup) {}
 
+// RegisterProtected registers protected routes.
 func (c *Controller) RegisterProtected(route *gin.RouterGroup) {
 	tasks := route.Group("/tasks")
 	{
 		tasks.GET("", c.getAllTasks)
 		tasks.GET("/:id", c.getTask)
 	}
-
 }
 
+// RegisterPrivileged registers privileged routes.
 func (c *Controller) RegisterPrivileged(route *gin.RouterGroup) {
 	tasks := route.Group("/tasks")
 	{
 		tasks.POST("", c.addTask)
 		tasks.PUT("/:id", c.updateTask)
 		tasks.DELETE("/:id", c.deleteTask)
-
 	}
 }
 
@@ -71,39 +72,41 @@ func (c *Controller) addTask(ctx *gin.Context) {
 	var request dto.AddTaskRequest
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Problem(ctx, errapi.NewBadRequest(err.Error()))
 		return
 	}
 
 	cmd := addcmd.NewCommand(request.Title, request.Description, request.Status, request.DueDate)
 	task, err := c.addHandler.Handle(cmd)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Problem(ctx, errapi.FromErrDMN(err.(*errdmn.Error)))
 		return
 	}
 
-	// Extract the base URL
+	response := dto.TaskResponse{
+		ID:          task.ID(),
+		Title:       task.Title(),
+		Description: task.Description(),
+		DueDate:     task.DueDate(),
+		Status:      task.Status(),
+	}
+
 	baseURL := fmt.Sprintf("http://%s", ctx.Request.Host)
-
-	// Construct the resource location
 	resourceLocation := fmt.Sprintf("%s%s/%s", baseURL, ctx.Request.URL.Path, task.ID().String())
-
-	// Set the Location header and return the response
-	ctx.Header("Location", resourceLocation)
-	ctx.Status(http.StatusCreated)
+	c.RespondWithLocation(ctx, http.StatusCreated, response, resourceLocation)
 }
 
 func (c *Controller) updateTask(ctx *gin.Context) {
 	id, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid task ID"})
+		c.Problem(ctx, errapi.FromErrDMN(err.(*errdmn.Error)))
 		return
 	}
 
 	var request dto.AddTaskRequest
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Problem(ctx, errapi.FromErrDMN(err.(*errdmn.Error)))
 		return
 	}
 
@@ -111,40 +114,40 @@ func (c *Controller) updateTask(ctx *gin.Context) {
 	_, err = c.updateHandler.Handle(cmd)
 	if err != nil {
 		if err == errdmn.TaskNotFound {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
+			c.Problem(ctx, errapi.FromErrDMN(err.(*errdmn.Error)))
 		} else {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			c.Problem(ctx, errapi.FromErrDMN(err.(*errdmn.Error)))
 		}
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	c.Respond(ctx, http.StatusOK, nil)
 }
 
 func (c *Controller) deleteTask(ctx *gin.Context) {
 	id, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid task ID"})
+		c.Problem(ctx, errapi.FromErrDMN(err.(*errdmn.Error)))
 		return
 	}
 
 	_, err = c.deleteHandler.Handle(id)
 	if err != nil {
 		if err == errdmn.TaskNotFound {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
+			c.Problem(ctx, errapi.FromErrDMN(err.(*errdmn.Error)))
 		} else {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.Problem(ctx, errapi.FromErrDMN(err.(*errdmn.Error)))
 		}
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	c.Respond(ctx, http.StatusOK, nil)
 }
 
 func (c *Controller) getAllTasks(ctx *gin.Context) {
 	tasks, err := c.getAllHandler.Handle(struct{}{})
 	if err != nil {
-		ctx.Status(http.StatusInternalServerError)
+		c.Problem(ctx, errapi.FromErrDMN(err.(*errdmn.Error)))
 		return
 	}
 
@@ -158,22 +161,22 @@ func (c *Controller) getAllTasks(ctx *gin.Context) {
 			Status:      task.Status(),
 		})
 	}
-	ctx.JSON(http.StatusOK, response)
+	c.Respond(ctx, http.StatusOK, response)
 }
 
 func (c *Controller) getTask(ctx *gin.Context) {
 	id, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid task ID"})
+		c.Problem(ctx, errapi.NewBadRequest(err.Error()))
 		return
 	}
 
 	task, err := c.getHandler.Handle(id)
 	if err != nil {
 		if err == errdmn.TaskNotFound {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
+			c.Problem(ctx, errapi.FromErrDMN(err.(*errdmn.Error)))
 		} else {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.Problem(ctx, errapi.FromErrDMN(err.(*errdmn.Error)))
 		}
 		return
 	}
@@ -186,5 +189,5 @@ func (c *Controller) getTask(ctx *gin.Context) {
 		Status:      task.Status(),
 	}
 
-	ctx.IndentedJSON(http.StatusOK, response)
+	c.Respond(ctx, http.StatusOK, response)
 }
