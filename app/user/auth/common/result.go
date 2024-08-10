@@ -13,6 +13,7 @@ type Result struct {
 	ID       uuid.UUID // Unique identifier for the user.
 	Username string    // Username of the authenticated user.
 	Token    string    // Authentication token.
+	IsAdmin  bool
 }
 
 // New creates a new authentication result with the given user and token.
@@ -21,6 +22,6 @@ func New(user *usermodel.User, token string) *Result {
 		ID:       user.ID(),
 		Username: user.Username(),
 		Token:    token,
+		IsAdmin:  user.IsAdmin(),
 	}
 }
-

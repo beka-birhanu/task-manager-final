@@ -5,9 +5,9 @@ package loginqry
 import (
 	"fmt"
 
+	iquery "github.com/beka-birhanu/app/common/cqrs/query"
 	ijwt "github.com/beka-birhanu/app/common/i_jwt"
 	irepo "github.com/beka-birhanu/app/common/i_repo"
-	errapp "github.com/beka-birhanu/app/error"
 	authresult "github.com/beka-birhanu/app/user/auth/common"
 	errdmn "github.com/beka-birhanu/domain/errors"
 	ihash "github.com/beka-birhanu/domain/i_hash"
@@ -19,6 +19,9 @@ type Handler struct {
 	jwtSvc   ijwt.Service  // Service for JWT operations.
 	hashSvc  ihash.Service // Service for password hashing.
 }
+
+// Ensure Handler implements iquery.Handler
+var _ iquery.IHandler[*Query, *authresult.Result] = &Handler{}
 
 // Config holds the dependencies for creating a new Handler.
 type Config struct {
@@ -41,7 +44,7 @@ func (s *Handler) Handle(qry *Query) (*authresult.Result, error) {
 	// Retrieve user by username.
 	user, err := s.userRepo.ByUsername(qry.Username)
 	if err != nil {
-		return nil, err
+		return nil, errdmn.NewUnauthorized(err.Error())
 	}
 
 	// Validate the provided password.
@@ -52,7 +55,7 @@ func (s *Handler) Handle(qry *Query) (*authresult.Result, error) {
 	}
 
 	if !isPasswordCorrect {
-		return nil, errapp.InvalidCredential("incorrect password")
+		return nil, errdmn.NewUnauthorized("incorrect password")
 	}
 
 	// Generate JWT for the authenticated user.
@@ -64,4 +67,3 @@ func (s *Handler) Handle(qry *Query) (*authresult.Result, error) {
 
 	return authresult.New(user, token), nil
 }
-

@@ -3,8 +3,7 @@
 package registercmd
 
 import (
-	"fmt"
-
+	icmd "github.com/beka-birhanu/app/common/cqrs/command"
 	ijwt "github.com/beka-birhanu/app/common/i_jwt"
 	irepo "github.com/beka-birhanu/app/common/i_repo"
 	authresult "github.com/beka-birhanu/app/user/auth/common"
@@ -18,6 +17,9 @@ type Handler struct {
 	jwtSvc   ijwt.Service  // Service for JWT operations.
 	hashSvc  ihash.Service // Service for password hashing.
 }
+
+// Ensure Handler implementes icmd.Handler
+var _ icmd.IHandler[*Command, *authresult.Result] = &Handler{}
 
 // Config holds the dependencies for creating a new Handler.
 type Config struct {
@@ -51,18 +53,18 @@ func (h *Handler) Handle(cmd *Command) (*authresult.Result, error) {
 	// Create a new user.
 	user, err := createUser(cmd, h.hashSvc, isAdmin)
 	if err != nil {
-		return nil, fmt.Errorf("creating new user failed: %w", err)
+		return nil, err
 	}
 
 	// Save the new user to the repository.
 	if err := h.userRepo.Save(user); err != nil {
-		return nil, fmt.Errorf("saving user to repository failed: %w", err)
+		return nil, err
 	}
 
 	// Generate a JWT for the new user.
 	token, err := h.jwtSvc.Generate(user)
 	if err != nil {
-		return nil, fmt.Errorf("JWT generation failed: %w", err)
+		return nil, err
 	}
 
 	return authresult.New(user, token), nil
@@ -78,4 +80,3 @@ func createUser(cmd *Command, hashSvc ihash.Service, isAdmin bool) (*usermodel.U
 	}
 	return usermodel.New(cfg)
 }
-

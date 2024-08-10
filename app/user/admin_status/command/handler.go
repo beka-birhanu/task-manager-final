@@ -5,6 +5,7 @@ package promotcmd
 import (
 	"log"
 
+	icmd "github.com/beka-birhanu/app/common/cqrs/command"
 	irepo "github.com/beka-birhanu/app/common/i_repo"
 )
 
@@ -12,6 +13,9 @@ import (
 type Handler struct {
 	userRepo irepo.User
 }
+
+// Ensure Handler implement icmd.Handler
+var _ icmd.IHandler[*Command, bool] = &Handler{}
 
 // New creates a new instance of the Handler with the provided user repository.
 func New(userRepo irepo.User) *Handler {
@@ -39,4 +43,3 @@ func (h *Handler) Handle(cmd *Command) (bool, error) {
 	log.Printf("Admin %v promoted user %v", admin.Username(), user.Username())
 	return true, nil
 }
-

@@ -3,6 +3,7 @@
 package updatecmd
 
 import (
+	icmd "github.com/beka-birhanu/app/common/cqrs/command"
 	irepo "github.com/beka-birhanu/app/common/i_repo"
 	taskmodel "github.com/beka-birhanu/domain/models/task"
 )
@@ -10,6 +11,9 @@ import (
 type Handler struct {
 	repo irepo.Task
 }
+
+// Ensure Handler implements icmd.IHandler
+var _ icmd.IHandler[*Command, *taskmodel.Task] = &Handler{}
 
 // NewHandler creates a new instance of Handler with the provided task repository.
 func NewHandler(taskRepo irepo.Task) *Handler {

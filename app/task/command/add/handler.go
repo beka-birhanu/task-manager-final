@@ -3,14 +3,18 @@
 package addcmd
 
 import (
+	icmd "github.com/beka-birhanu/app/common/cqrs/command"
 	irepo "github.com/beka-birhanu/app/common/i_repo"
 	taskmodel "github.com/beka-birhanu/domain/models/task"
 )
 
 // Handler handles the logic for adding a new task to the repository.
 type Handler struct {
-	repo irepo.Task // Repository for task-related operations.
+	repo irepo.Task
 }
+
+// Ensure Handler implements icmd.IHandler
+var _ icmd.IHandler[*Command, *taskmodel.Task] = &Handler{}
 
 // NewHandler creates a new instance of Handler with the given task repository.
 func NewHandler(repo irepo.Task) *Handler {
@@ -36,4 +40,3 @@ func (h *Handler) Handle(cmd *Command) (*taskmodel.Task, error) {
 
 	return task, nil
 }
-
