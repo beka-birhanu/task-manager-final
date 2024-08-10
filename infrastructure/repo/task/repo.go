@@ -51,13 +51,13 @@ func (r *Repo) Save(task *taskmodel.Task) error {
 	ctx, cancel := createScopedContext()
 	defer cancel()
 
-	filter := bson.M{"_id": task.ID}
+	filter := bson.M{"_id": task.ID()}
 	update := bson.M{
 		"$set": bson.M{
-			"title":       task.Title,
-			"description": task.Description,
-			"dueDate":     task.DueDate,
-			"status":      task.Status,
+			"title":       task.Title(),
+			"description": task.Description(),
+			"dueDate":     task.DueDate(),
+			"status":      task.Status(),
 			"updatedAt":   time.Now(),
 		},
 	}
