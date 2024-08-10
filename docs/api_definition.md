@@ -1,6 +1,7 @@
 ## Task Management API
 
 This API allows users to manage tasks and handle user authentication. It provides endpoints to create, update, delete, and retrieve tasks, along with user registration, login, and logout.
+[postman docs](https://documenter.getpostman.com/view/37481680/2sA3s3Fqkb)
 
 ### API Endpoints
 
