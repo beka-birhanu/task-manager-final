@@ -10,9 +10,9 @@ package router
 import (
 	"log"
 
-	"github.com/beka-birhanu/api"
-	authmiddleware "github.com/beka-birhanu/api/middleware/auth"
-	"github.com/beka-birhanu/app/common/i_jwt"
+	"github.com/beka-birhanu/task_manager_final/src/api"
+	authmiddleware "github.com/beka-birhanu/task_manager_final/src/api/middleware/auth"
+	ijwt "github.com/beka-birhanu/task_manager_final/src/app/common/i_jwt"
 	"github.com/gin-gonic/gin"
 )
 

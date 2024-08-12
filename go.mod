@@ -1,4 +1,4 @@
-module github.com/beka-birhanu
+module github.com/beka-birhanu/task_manager_final
 
 go 1.20
 

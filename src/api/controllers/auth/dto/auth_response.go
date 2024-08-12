@@ -1,6 +1,6 @@
 package dto
 
-import authresult "github.com/beka-birhanu/app/user/auth/common"
+import authresult "github.com/beka-birhanu/task_manager_final/src/app/user/auth/common"
 
 type AuthResponse struct {
 	ID       string `json:"id"`

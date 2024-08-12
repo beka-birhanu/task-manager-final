@@ -3,15 +3,15 @@ package authcontroller
 import (
 	"net/http"
 
-	"github.com/beka-birhanu/api/controllers/auth/dto"
-	basecontroller "github.com/beka-birhanu/api/controllers/base"
-	errapi "github.com/beka-birhanu/api/errors"
-	icmd "github.com/beka-birhanu/app/common/cqrs/command"
-	iquery "github.com/beka-birhanu/app/common/cqrs/query"
-	registercmd "github.com/beka-birhanu/app/user/auth/command"
-	authresult "github.com/beka-birhanu/app/user/auth/common"
-	loginqry "github.com/beka-birhanu/app/user/auth/query"
-	errdmn "github.com/beka-birhanu/domain/errors"
+	"github.com/beka-birhanu/task_manager_final/src/api/controllers/auth/dto"
+	basecontroller "github.com/beka-birhanu/task_manager_final/src/api/controllers/base"
+	errapi "github.com/beka-birhanu/task_manager_final/src/api/errors"
+	icmd "github.com/beka-birhanu/task_manager_final/src/app/common/cqrs/command"
+	iquery "github.com/beka-birhanu/task_manager_final/src/app/common/cqrs/query"
+	registercmd "github.com/beka-birhanu/task_manager_final/src/app/user/auth/command"
+	authresult "github.com/beka-birhanu/task_manager_final/src/app/user/auth/common"
+	loginqry "github.com/beka-birhanu/task_manager_final/src/app/user/auth/query"
+	errdmn "github.com/beka-birhanu/task_manager_final/src/domain/errors"
 	"github.com/gin-gonic/gin"
 )
 

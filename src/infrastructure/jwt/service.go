@@ -20,8 +20,8 @@ import (
 	"errors"
 	"time"
 
-	ijwt "github.com/beka-birhanu/app/common/i_jwt"
-	usermodel "github.com/beka-birhanu/domain/models/user"
+	ijwt "github.com/beka-birhanu/task_manager_final/src/app/common/i_jwt"
+	usermodel "github.com/beka-birhanu/task_manager_final/src/domain/models/user"
 	"github.com/dgrijalva/jwt-go"
 )
 

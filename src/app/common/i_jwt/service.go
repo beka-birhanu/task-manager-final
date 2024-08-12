@@ -2,7 +2,7 @@
 package ijwt
 
 import (
-	usermodel "github.com/beka-birhanu/domain/models/user"
+	usermodel "github.com/beka-birhanu/task_manager_final/src/domain/models/user"
 	"github.com/dgrijalva/jwt-go"
 )
 
@@ -14,4 +14,3 @@ type Service interface {
 	// Decode parses a JWT and returns claims.
 	Decode(token string) (jwt.MapClaims, error)
 }
-

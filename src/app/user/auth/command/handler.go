@@ -3,12 +3,12 @@
 package registercmd
 
 import (
-	icmd "github.com/beka-birhanu/app/common/cqrs/command"
-	ijwt "github.com/beka-birhanu/app/common/i_jwt"
-	irepo "github.com/beka-birhanu/app/common/i_repo"
-	authresult "github.com/beka-birhanu/app/user/auth/common"
-	ihash "github.com/beka-birhanu/domain/i_hash"
-	usermodel "github.com/beka-birhanu/domain/models/user"
+	icmd "github.com/beka-birhanu/task_manager_final/src/app/common/cqrs/command"
+	ijwt "github.com/beka-birhanu/task_manager_final/src/app/common/i_jwt"
+	irepo "github.com/beka-birhanu/task_manager_final/src/app/common/i_repo"
+	authresult "github.com/beka-birhanu/task_manager_final/src/app/user/auth/common"
+	ihash "github.com/beka-birhanu/task_manager_final/src/domain/i_hash"
+	usermodel "github.com/beka-birhanu/task_manager_final/src/domain/models/user"
 )
 
 // Handler handles the user registration process.

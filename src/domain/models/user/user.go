@@ -19,8 +19,8 @@ package usermodel
 import (
 	"regexp"
 
-	errdmn "github.com/beka-birhanu/domain/errors"
-	"github.com/beka-birhanu/domain/i_hash"
+	errdmn "github.com/beka-birhanu/task_manager_final/src/domain/errors"
+	ihash "github.com/beka-birhanu/task_manager_final/src/domain/i_hash"
 	"github.com/google/uuid"
 	"github.com/nbutton23/zxcvbn-go"
 )
@@ -187,4 +187,3 @@ func (u *User) UpdatePassword(newPassword string, passwordHasher ihash.Service) 
 func (u *User) UpdateAdminStatus(isAdmin bool) {
 	u.isAdmin = isAdmin
 }
-

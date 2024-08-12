@@ -5,12 +5,12 @@ package loginqry
 import (
 	"fmt"
 
-	iquery "github.com/beka-birhanu/app/common/cqrs/query"
-	ijwt "github.com/beka-birhanu/app/common/i_jwt"
-	irepo "github.com/beka-birhanu/app/common/i_repo"
-	authresult "github.com/beka-birhanu/app/user/auth/common"
-	errdmn "github.com/beka-birhanu/domain/errors"
-	ihash "github.com/beka-birhanu/domain/i_hash"
+	iquery "github.com/beka-birhanu/task_manager_final/src/app/common/cqrs/query"
+	ijwt "github.com/beka-birhanu/task_manager_final/src/app/common/i_jwt"
+	irepo "github.com/beka-birhanu/task_manager_final/src/app/common/i_repo"
+	authresult "github.com/beka-birhanu/task_manager_final/src/app/user/auth/common"
+	errdmn "github.com/beka-birhanu/task_manager_final/src/domain/errors"
+	ihash "github.com/beka-birhanu/task_manager_final/src/domain/i_hash"
 )
 
 // Handler processes login queries.

@@ -3,11 +3,11 @@ package usercontroller
 import (
 	"net/http"
 
-	basecontroller "github.com/beka-birhanu/api/controllers/base"
-	errapi "github.com/beka-birhanu/api/errors"
-	icmd "github.com/beka-birhanu/app/common/cqrs/command"
-	promotcmd "github.com/beka-birhanu/app/user/admin_status/command"
-	errdmn "github.com/beka-birhanu/domain/errors"
+	basecontroller "github.com/beka-birhanu/task_manager_final/src/api/controllers/base"
+	errapi "github.com/beka-birhanu/task_manager_final/src/api/errors"
+	icmd "github.com/beka-birhanu/task_manager_final/src/app/common/cqrs/command"
+	promotcmd "github.com/beka-birhanu/task_manager_final/src/app/user/admin_status/command"
+	errdmn "github.com/beka-birhanu/task_manager_final/src/domain/errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

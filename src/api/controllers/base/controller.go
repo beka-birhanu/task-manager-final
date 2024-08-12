@@ -3,7 +3,7 @@ package basecontroller
 import (
 	"net/http"
 
-	errapi "github.com/beka-birhanu/api/errors"
+	errapi "github.com/beka-birhanu/task_manager_final/src/api/errors"
 	"github.com/gin-gonic/gin"
 )
 

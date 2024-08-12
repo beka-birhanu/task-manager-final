@@ -2,7 +2,7 @@
 package irepo
 
 import (
-	taskmodel "github.com/beka-birhanu/domain/models/task"
+	taskmodel "github.com/beka-birhanu/task_manager_final/src/domain/models/task"
 	"github.com/google/uuid"
 )
 
@@ -21,4 +21,3 @@ type Task interface {
 	// GetSingle returns a task by ID.
 	GetSingle(id uuid.UUID) (*taskmodel.Task, error)
 }
-

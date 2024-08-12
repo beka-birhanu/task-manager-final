@@ -20,7 +20,7 @@ package taskmodel
 import (
 	"time"
 
-	errdmn "github.com/beka-birhanu/domain/errors"
+	errdmn "github.com/beka-birhanu/task_manager_final/src/domain/errors"
 	"github.com/google/uuid"
 )
 

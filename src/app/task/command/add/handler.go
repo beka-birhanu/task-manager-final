@@ -3,9 +3,9 @@
 package addcmd
 
 import (
-	icmd "github.com/beka-birhanu/app/common/cqrs/command"
-	irepo "github.com/beka-birhanu/app/common/i_repo"
-	taskmodel "github.com/beka-birhanu/domain/models/task"
+	icmd "github.com/beka-birhanu/task_manager_final/src/app/common/cqrs/command"
+	irepo "github.com/beka-birhanu/task_manager_final/src/app/common/i_repo"
+	taskmodel "github.com/beka-birhanu/task_manager_final/src/domain/models/task"
 )
 
 // Handler handles the logic for adding a new task to the repository.

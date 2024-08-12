@@ -16,9 +16,9 @@ import (
 	"context"
 	"time"
 
-	irepo "github.com/beka-birhanu/app/common/i_repo"
-	errdmn "github.com/beka-birhanu/domain/errors"
-	taskmodel "github.com/beka-birhanu/domain/models/task"
+	irepo "github.com/beka-birhanu/task_manager_final/src/app/common/i_repo"
+	errdmn "github.com/beka-birhanu/task_manager_final/src/domain/errors"
+	taskmodel "github.com/beka-birhanu/task_manager_final/src/domain/models/task"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

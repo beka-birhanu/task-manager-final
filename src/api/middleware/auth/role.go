@@ -6,7 +6,7 @@ import (
 	"errors"
 	"net/http"
 
-	ijwt "github.com/beka-birhanu/app/common/i_jwt"
+	ijwt "github.com/beka-birhanu/task_manager_final/src/app/common/i_jwt"
 	"github.com/gin-gonic/gin"
 )
 

@@ -4,17 +4,16 @@ import (
 	"fmt"
 	"net/http"
 
-	errapi "github.com/beka-birhanu/api/errors"
+	basecontroller "github.com/beka-birhanu/task_manager_final/src/api/controllers/base"
+	"github.com/beka-birhanu/task_manager_final/src/api/controllers/task/dto"
+	errapi "github.com/beka-birhanu/task_manager_final/src/api/errors"
+	icmd "github.com/beka-birhanu/task_manager_final/src/app/common/cqrs/command"
+	addcmd "github.com/beka-birhanu/task_manager_final/src/app/task/command/add"
+	updatecmd "github.com/beka-birhanu/task_manager_final/src/app/task/command/update"
+	errdmn "github.com/beka-birhanu/task_manager_final/src/domain/errors"
+	taskmodel "github.com/beka-birhanu/task_manager_final/src/domain/models/task"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-
-	basecontroller "github.com/beka-birhanu/api/controllers/base"
-	"github.com/beka-birhanu/api/controllers/task/dto"
-	icmd "github.com/beka-birhanu/app/common/cqrs/command"
-	addcmd "github.com/beka-birhanu/app/task/command/add"
-	updatecmd "github.com/beka-birhanu/app/task/command/update"
-	errdmn "github.com/beka-birhanu/domain/errors"
-	taskmodel "github.com/beka-birhanu/domain/models/task"
 )
 
 // Controller handles HTTP requests related to tasks.

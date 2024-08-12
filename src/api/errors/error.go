@@ -1,6 +1,6 @@
 package errapi
 
-import errdmn "github.com/beka-birhanu/domain/errors"
+import errdmn "github.com/beka-birhanu/task_manager_final/src/domain/errors"
 
 // HTTP status codes used in the Error type.
 const (

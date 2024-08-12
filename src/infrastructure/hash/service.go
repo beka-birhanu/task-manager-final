@@ -22,7 +22,7 @@ import (
 	"errors"
 	"sync"
 
-	ihash "github.com/beka-birhanu/domain/i_hash"
+	ihash "github.com/beka-birhanu/task_manager_final/src/domain/i_hash"
 	"golang.org/x/crypto/pbkdf2"
 )
 

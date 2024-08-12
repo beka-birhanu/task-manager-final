@@ -3,7 +3,7 @@
 package authresult
 
 import (
-	usermodel "github.com/beka-birhanu/domain/models/user"
+	usermodel "github.com/beka-birhanu/task_manager_final/src/domain/models/user"
 	"github.com/google/uuid"
 )
 

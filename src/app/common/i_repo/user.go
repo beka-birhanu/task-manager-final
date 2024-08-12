@@ -2,7 +2,7 @@
 package irepo
 
 import (
-	usermodel "github.com/beka-birhanu/domain/models/user"
+	usermodel "github.com/beka-birhanu/task_manager_final/src/domain/models/user"
 	"github.com/google/uuid"
 )
 
@@ -13,4 +13,3 @@ type User interface {
 	ByUsername(username string) (*usermodel.User, error)
 	Count() (int64, error)
 }
-
