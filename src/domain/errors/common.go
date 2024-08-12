@@ -82,4 +82,3 @@ func NewNotFound(message string) *Error {
 func NewUnauthorized(message string) *Error {
 	return new(Unauthorized, message)
 }
-
