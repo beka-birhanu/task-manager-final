@@ -92,20 +92,6 @@ func New(config Config) (*User, error) {
 	}, nil
 }
 
-// ToBSON creates a new User with a pre-hashed password.
-func ToBSON(config ConfigBSON) (*User, error) {
-	if err := validateUsername(config.Username); err != nil {
-		return nil, err
-	}
-
-	return &User{
-		id:           config.ID,
-		username:     config.Username,
-		passwordHash: config.PasswordHash,
-		isAdmin:      config.IsAdmin,
-	}, nil
-}
-
 // FromBSON creates a User from a BSON representation.
 func FromBSON(bsonUser *UserBSON) *User {
 	return &User{
