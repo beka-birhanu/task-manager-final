@@ -1,4 +1,4 @@
-package iquery
+package iquery_mock
 
 import "github.com/stretchr/testify/mock"
 
