@@ -20,12 +20,18 @@ func (m *User) Save(user *usermodel.User) error {
 // ById mocks the ById method of the User interface.
 func (m *User) ById(id uuid.UUID) (*usermodel.User, error) {
 	args := m.Called(id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
 	return args.Get(0).(*usermodel.User), args.Error(1)
 }
 
 // ByUsername mocks the ByUsername method of the User interface.
 func (m *User) ByUsername(username string) (*usermodel.User, error) {
 	args := m.Called(username)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
 	return args.Get(0).(*usermodel.User), args.Error(1)
 }
 
