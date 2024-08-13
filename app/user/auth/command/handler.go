@@ -3,8 +3,6 @@
 package registercmd
 
 import (
-	"log"
-
 	icmd "github.com/beka-birhanu/task_manager_final/app/common/cqrs/command"
 	ijwt "github.com/beka-birhanu/task_manager_final/app/common/i_jwt"
 	irepo "github.com/beka-birhanu/task_manager_final/app/common/i_repo"
