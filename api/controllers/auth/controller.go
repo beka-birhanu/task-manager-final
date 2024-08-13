@@ -61,7 +61,7 @@ func (c *Controller) registerUser(ctx *gin.Context) {
 	var request dto.AuthRequest
 
 	if err := ctx.ShouldBind(&request); err != nil {
-		c.Problem(ctx, errapi.FromErrDMN(err.(*errdmn.Error)))
+		c.Problem(ctx, errapi.NewBadRequest(err.Error()))
 		return
 	}
 
