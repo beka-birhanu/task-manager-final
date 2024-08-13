@@ -20,5 +20,8 @@ func (m *MockService) Generate(user *usermodel.User) (string, error) {
 // Decode mocks the Decode method of the Service interface.
 func (m *MockService) Decode(token string) (jwt.MapClaims, error) {
 	args := m.Called(token)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
 	return args.Get(0).(jwt.MapClaims), args.Error(1)
 }
