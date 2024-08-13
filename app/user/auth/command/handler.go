@@ -3,6 +3,8 @@
 package registercmd
 
 import (
+	"log"
+
 	icmd "github.com/beka-birhanu/task_manager_final/app/common/cqrs/command"
 	ijwt "github.com/beka-birhanu/task_manager_final/app/common/i_jwt"
 	irepo "github.com/beka-birhanu/task_manager_final/app/common/i_repo"
@@ -50,18 +52,15 @@ func (h *Handler) Handle(cmd *Command) (*authresult.Result, error) {
 		isAdmin = true
 	}
 
-	// Create a new user.
 	user, err := createUser(cmd, h.hashSvc, isAdmin)
 	if err != nil {
 		return nil, err
 	}
 
-	// Save the new user to the repository.
 	if err := h.userRepo.Save(user); err != nil {
 		return nil, err
 	}
 
-	// Generate a JWT for the new user.
 	token, err := h.jwtSvc.Generate(user)
 	if err != nil {
 		return nil, err
