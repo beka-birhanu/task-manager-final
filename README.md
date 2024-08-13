@@ -8,49 +8,162 @@ Here's the updated project structure, grouped by layers and presented in a table
 
 ### Project Structure
 
-| **Layer**          | **Directory/File**              | **Description**                                    |
-| ------------------ | ------------------------------- | -------------------------------------------------- |
-| **API**            | `api/controllers/auth`          | Authentication controllers and DTOs.               |
-|                    | `api/controllers/auth/dto`      | Data Transfer Objects for authentication.          |
-|                    | `api/controllers/base`          | Base controller for shared logic.                  |
-|                    | `api/controllers/task`          | Task controllers and DTOs.                         |
-|                    | `api/controllers/task/dto`      | Data Transfer Objects for tasks.                   |
-|                    | `api/controllers/user`          | User controllers.                                  |
-|                    | `api/errors`                    | API error handling and definitions.                |
-|                    | `api/middleware/auth`           | Middleware for role-based authentication.          |
-|                    | `api/router`                    | Router configuration and initialization.           |
-|                    | `api/i_controller.go`           | Interface for controllers.                         |
-| **Domain**         | `domain/errors`                 | Domain-specific error definitions.                 |
-|                    | `domain/i_hash`                 | Interface for hashing service.                     |
-|                    | `domain/models/task`            | Task model definition.                             |
-|                    | `domain/models/user`            | User model definition.                             |
-| **App**            | `app/common/cqrs/command`       | CQRS command handlers and interfaces.              |
-|                    | `app/common/cqrs/query`         | CQRS query handlers and interfaces.                |
-|                    | `app/common/i_jwt`              | Interface for JWT service.                         |
-|                    | `app/common/i_repo`             | Interface for repositories (task, user).           |
-|                    | `app/task/command/add`          | Command for adding a task.                         |
-|                    | `app/task/command/delete`       | Command for deleting a task.                       |
-|                    | `app/task/command/update`       | Command for updating a task.                       |
-|                    | `app/task/query/get`            | Query for retrieving a single task.                |
-|                    | `app/task/query/get_all`        | Query for retrieving all tasks.                    |
-|                    | `app/user/admin_status/command` | Command for updating user admin status.            |
-|                    | `app/user/auth/command`         | Command for user authentication (register, login). |
-|                    | `app/user/auth/common`          | Common authentication-related logic and results.   |
-|                    | `app/user/auth/query`           | Query for user authentication.                     |
-| **Infrastructure** | `infrastructure/db`             | Database connection and setup.                     |
-|                    | `infrastructure/hash`           | Hashing service implementation.                    |
-|                    | `infrastructure/jwt`            | JWT service implementation.                        |
-|                    | `infrastructure/repo/task`      | Task repository implementation.                    |
-|                    | `infrastructure/repo/user`      | User repository implementation.                    |
-| **Config**         | `config/env.go`                 | Environment variable configuration.                |
-| **Documentation**  | `docs/api_definition.md`        | API definition and usage documentation.            |
-| **Root**           | `example.env`                   | Example environment file.                          |
-|                    | `main.go`                       | Entry point for the application.                   |
-|                    | `README.md`                     | Project documentation.                             |
-|                    | `go.mod`                        | Go module file for dependency management.          |
-|                    | `go.sum`                        | Go module checksums for dependencies.              |
+### **API**
 
-This table groups the files by layers, providing a clear overview of the project structure.
+```
+api
+├── controllers
+│   ├── auth
+│   │   ├── dto
+│   │   │   ├── auth_request.go
+│   │   │   └── auth_response.go
+│   │   ├── controller.go
+│   │   └── controller_test.go
+│   ├── base
+│   │   └── controller.go
+│   ├── task
+│   │   ├── dto
+│   │   │   ├── add_request.go
+│   │   │   └── get_response.go
+│   │   ├── task_controller.go
+│   │   └── task_controller_test.go
+│   └── user
+│       ├── controller.go
+│       └── controller_test.go
+├── errors
+│   └── error.go
+├── middleware
+│   └── auth
+│       ├── role.go
+│       └── role_test.go
+├── router
+│   └── router.go
+└── i_controller.go
+```
+
+### **App**
+
+```
+app
+├── common
+│   ├── cqrs
+│   │   ├── command
+│   │   │   ├── mocks
+│   │   │   │   └── command_handler_mock.go
+│   │   │   └── command_handler.go
+│   │   └── query
+│   │       ├── mocks
+│   │       │   └── query_handler_mock.go
+│   │       └── query_handler.go
+│   ├── i_jwt
+│   │   ├── mock
+│   │   │   └── service_mock.go
+│   │   └── service.go
+│   └── i_repo
+│       ├── mocks
+│       │   ├── task_mock.go
+│       │   └── user_mock.go
+│       ├── task.go
+│       └── user.go
+├── task
+│   ├── command
+│   │   ├── add
+│   │   │   ├── command.go
+│   │   │   ├── handler.go
+│   │   │   └── handler_test.go
+│   │   ├── delete
+│   │   │   ├── handler.go
+│   │   │   └── handler_test.go
+│   │   └── update
+│   │       ├── command.go
+│   │       ├── handler.go
+│   │       └── handler_test.go
+│   └── query
+│       ├── get
+│       │   ├── handler.go
+│       │   └── handle_test.go
+│       └── get_all
+│           ├── handler.go
+│           └── handler_test.go
+└── user
+    ├── admin_status
+    │   └── command
+    │       ├── command.go
+    │       ├── handler.go
+    │       └── handler_test.go
+    └── auth
+        ├── command
+        │   ├── command.go
+        │   ├── handler.go
+        │   └── handler_test.go
+        ├── common
+        │   └── result.go
+        └── query
+            ├── handler.go
+            ├── handler_test.go
+            └── query.go
+```
+
+### **Domain**
+
+```
+domain
+├── errors
+│   ├── common.go
+│   ├── task.go
+│   └── user.go
+├── i_hash
+│   ├── mocks
+│   │   └── Service.go
+│   └── service.go
+└── models
+    ├── task
+    │   ├── task.go
+    │   └── task_test.go
+    └── user
+        ├── user.go
+        └── user_test.go
+```
+
+### **Infrastructure**
+
+```
+infrastructure
+├── db
+│   └── db.go
+├── hash
+│   ├── service.go
+│   └── service_test.go
+├── jwt
+│   ├── service.go
+│   └── service_test.go
+└── repo
+    ├── task
+    │   ├── repo.go
+    │   └── repo_test.go
+    └── user
+        └── repo.go
+```
+
+### **Others**
+
+````
+bin
+└── task-manager
+config
+└── env.go
+docs
+└── api_definition.md
+scripts
+└── filter_test_packages.sh
+coverage.out
+example.env
+go.mod
+go.sum
+main.go
+Makefile
+README.md
+```                    | `go.sum`                        | Go module checksums for dependencies.              |
 
 ## Installation
 
@@ -58,8 +171,7 @@ This table groups the files by layers, providing a clear overview of the project
 
    ```bash
    git clone https://github.com/beka-birhanu/task-manager-authentication.git
-   .git
-   ```
+````
 
 2. Change to the project directory:
 
@@ -96,27 +208,29 @@ Before running the application, ensure you have a MongoDB instance running and u
 
    Replace `<your-mongodb-connection-string>` and `<your-jwt-secret>` with your MongoDB connection string and a secure JWT secret, respectively.
 
-3. **Running the Application**:
-
-   After updating the configuration, you can run the application using:
-
-   ```bash
-   go run main.go
-   ```
-
-The application will start a server on port `8080`. You can access the API at `http://localhost:8080/api/v1`.
-
----
-
-This section ensures that users know how to configure the environment variables required to run the application.## Running the Application
+## Running the Application
 
 To run the application, use:
 
 ```bash
-go run main.go
+make run
 ```
 
 The application will start a server on port `8080`. You can access the API at `http://localhost:8080/api/v1`.
+
+## Testing
+
+To run tests with coverage, use:
+
+```bash
+make test
+```
+
+To generate and view a detailed test coverage report, use:
+
+```bash
+make coverage
+```
 
 ## API Endpoints
 
