@@ -147,7 +147,7 @@ infrastructure
 
 ### **Others**
 
-````
+```
 bin
 └── task-manager
 config
@@ -163,7 +163,7 @@ go.sum
 main.go
 Makefile
 README.md
-```                    | `go.sum`                        | Go module checksums for dependencies.              |
+```
 
 ## Installation
 
@@ -171,6 +171,8 @@ README.md
 
    ```bash
    git clone https://github.com/beka-birhanu/task-manager-authentication.git
+   ```
+
 ````
 
 2. Change to the project directory:
@@ -248,3 +250,4 @@ make coverage
   - **Promote User**: `PATCH /api/v1/users/{username}/promot`
 
 Refer to `docs/api_definition.md` for detailed API usage and request/response formats.
+````
