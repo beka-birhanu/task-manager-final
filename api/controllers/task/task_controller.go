@@ -105,7 +105,7 @@ func (c *Controller) updateTask(ctx *gin.Context) {
 	var request dto.AddTaskRequest
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
-		c.Problem(ctx, errapi.FromErrDMN(err.(*errdmn.Error)))
+		c.Problem(ctx, errapi.NewBadRequest(err.Error()))
 		return
 	}
 
